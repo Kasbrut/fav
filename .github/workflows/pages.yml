@@ -1,7 +1,11 @@
 name: Documentation site
 
-# Manual-only until the reviewed snapshot is moved to the public repository.
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
