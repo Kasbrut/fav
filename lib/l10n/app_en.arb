@@ -1636,6 +1636,7 @@
   "backupRevokeFinalBody": "Type {word} to enable peer revocation.",
   "@backupRevokeFinalBody": {"placeholders": {"word": {"type": "String"}}},
   "backupRevokeWord": "REVOKE",
+  "@backupRevokeWord": {"description": "Localized uppercase confirmation word the user must type to revoke all peers."},
   "backupRevokeAction": "Revoke peers",
   "backupVerifyingServer": "Checking {label} ({current} of {total})…",
   "@backupVerifyingServer": {"placeholders": {"label": {"type": "String"}, "current": {"type": "int"}, "total": {"type": "int"}}},

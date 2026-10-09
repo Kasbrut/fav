@@ -773,7 +773,7 @@
   "backupRevokeConfirmBody": "Ogni profilo WireGuard su ciascun server raggiungibile smetterà di funzionare. Sono inclusi i peer creati dopo questo backup e i profili usati da dispositivi non compromessi.",
   "backupRevokeFinalTitle": "Conferma finale",
   "backupRevokeFinalBody": "Digita {word} per abilitare la revoca dei peer.",
-  "backupRevokeWord": "REVOKE",
+  "backupRevokeWord": "REVOCA",
   "backupRevokeAction": "Revoca peer",
   "backupVerifyingServer": "Verifica di {label} ({current} di {total})…",
   "backupRestoreResultTitle": "Risultati del ripristino",

@@ -752,7 +752,7 @@
   "backupRevokeConfirmBody": "Every WireGuard profile on each reachable server will stop working. This includes peers created after this backup and profiles used by devices that are not compromised.",
   "backupRevokeFinalTitle": "Final confirmation",
   "backupRevokeFinalBody": "Type {word} to enable peer revocation.",
-  "backupRevokeWord": "REVOKE",
+  "backupRevokeWord": "İPTAL ET",
   "backupRevokeAction": "Revoke peers",
   "backupVerifyingServer": "Checking {label} ({current} of {total})…",
   "backupRestoreResultTitle": "Restore results",
