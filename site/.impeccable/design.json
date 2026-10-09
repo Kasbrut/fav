@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-08T00:00:00Z",
+  "title": "Design System: FAV Documentation",
+  "extensions": {
+    "colorMeta": {
+      "violet": { "role": "primary", "displayName": "FAV Violet", "canonical": "#6d4bc3" },
+      "paper": { "role": "neutral", "displayName": "Cool Paper", "canonical": "#f7f7fa" },
+      "ink": { "role": "neutral", "displayName": "Near-black Ink", "canonical": "#17151d" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Page and section openings." },
+      "body": { "displayName": "Reading text", "purpose": "Documentation and supporting copy." }
+    },
+    "shadows": [],
+    "motion": [],
+    "breakpoints": [
+      { "name": "single-column", "value": "760px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main next step on a page.",
+      "html": "<a class=\"ds-button-primary\" href=\"#\">Read the setup guide</a>",
+      "css": ".ds-button-primary { display:inline-flex; min-height:2.9rem; align-items:center; padding:.65rem 1rem; border-radius:10px; background:#17151d; color:#fff; font:700 1rem/1.4 'Atkinson Hyperlegible',sans-serif; text-decoration:none; } .ds-button-primary:hover { transform:translateY(-1px); } .ds-button-primary:focus-visible { outline:3px solid #b69cff; outline-offset:3px; }"
+    },
+    {
+      "name": "Information note",
+      "kind": "card",
+      "refersTo": "note",
+      "description": "Short operational context that belongs beside a decision.",
+      "html": "<div class=\"ds-note\">A WireGuard profile contains private key material.</div>",
+      "css": ".ds-note { max-width:70ch; padding:1.2rem 1.3rem; border-radius:14px; background:#eee9fb; color:#38266e; font:400 1rem/1.65 'Atkinson Hyperlegible',sans-serif; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Independent Technical Manual",
+    "overview": "Documentation first: decisive headings, calm reading columns, visible limits and restrained use of the FAV violet.",
+    "keyCharacteristics": ["Cool paper ground", "Measured reading width", "Structural rules", "No decorative technical imagery"],
+    "rules": [
+      { "name": "Rationed Accent", "body": "Use violet for orientation and actions, not large decoration.", "section": "colors" }
+    ],
+    "dos": ["Place security limits beside the decisions they affect.", "Use spacing and rules before another container."],
+    "donts": ["Do not fabricate proof or guarantees.", "Do not decorate with terminals, grids or glowing gradients."]
+  }
+}

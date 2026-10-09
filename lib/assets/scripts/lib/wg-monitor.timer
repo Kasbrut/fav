@@ -1,0 +1,20 @@
+# FAV — peer monitor timer (M15-T2). Fires wg-monitor.service
+# every 30 seconds. 30s matches WireGuard's 25s PersistentKeepalive default
+# closely enough that handshake/traffic deltas are detected with at most one
+# tick of delay.
+
+[Unit]
+Description=Run wg-monitor.service every 30 seconds (FAV)
+
+[Timer]
+# OnActiveSec fires ~10s after the timer itself (re)starts — this bootstraps the
+# first run on every enable, including a re-enable without a reboot (where
+# OnBootSec is stale and OnUnitActiveSec has nothing to anchor to yet).
+OnActiveSec=10s
+OnBootSec=10s
+OnUnitActiveSec=30s
+AccuracySec=5s
+Unit=wg-monitor.service
+
+[Install]
+WantedBy=timers.target

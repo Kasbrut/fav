@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Prepare a dedicated server and install WireGuard safely with FAV.">
+    <meta name="theme-color" content="#f7f7fa"><title>Getting started — FAV</title>
+    <link rel="stylesheet" href="../assets/site.css"><link rel="icon" href="../assets/favicon.png">
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header"><div class="header-inner"><a class="brand" href="./"><img src="../assets/favicon.png" alt="">FAV</a><nav class="nav" aria-label="Main navigation"><a href="./">Overview</a><a href="getting-started.html" aria-current="page">Get started</a><a href="downloads.html">Downloads</a><a href="security.html">Security</a><a href="support.html">Support</a><span class="language">English</span></nav></div></header>
+    <main id="content" class="page document">
+      <aside class="contents" aria-label="On this page"><strong>On this page</strong><a href="#prepare">Prepare the server</a><a href="#install">Install</a><a href="#connect">Connect a device</a><a href="#verify">Verify the result</a></aside>
+      <article class="article">
+        <h1>Set up your first server</h1>
+        <p class="lead">Start with a server you can rebuild. Keep its provider console open until the VPN and your independent SSH access have both been tested.</p>
+        <div class="notice"><strong>Use a dedicated server</strong><p>FAV changes SSH, firewall, forwarding and WireGuard configuration. Do not install it on a host carrying unrelated services or data you cannot afford to disrupt.</p></div>
+        <section id="prepare"><h2>Prepare the server</h2><ul class="checklist"><li>Use a maintained Debian or Ubuntu release with kernel 5.6 or newer, systemd, Bash and APT.</li><li>Have the server address, SSH port, username and password ready. A non-root account must have sudo access.</li><li>Allow the SSH TCP port and your chosen WireGuard UDP port in the provider firewall. The default WireGuard port is <code>51820</code>.</li><li>Keep the provider’s web or serial console available as an independent recovery path.</li></ul></section>
+        <section id="install"><h2>Install</h2><ol><li>Add the server in FAV and connect.</li><li>Compare the SSH fingerprint with a trusted value from the provider console. Do not approve a fingerprint you cannot verify.</li><li>Review the installation options. SSH hardening is optional and disabled by default.</li><li>If you enable hardening, add your own SSH public key and test the matching private key independently first.</li><li>Start installation and leave the app open when practical. If the connection drops, FAV can recover the detached installation run.</li></ol></section>
+        <section id="connect"><h2>Connect a device</h2><p>Create a separate peer for each device. A peer profile contains private key material, so treat its QR code and <code>.conf</code> file like a password.</p><ul><li>For the device running FAV, save the configuration file and import it into WireGuard.</li><li>For another phone or tablet, display the QR code in FAV and scan it from WireGuard on the destination device.</li><li>For desktop clients, use the configuration file.</li></ul><div class="inline-note"><p>WireGuard mobile clients can be particular about filenames. Keep the exported <code>.conf</code> extension and use a short, ordinary filename.</p></div></section>
+        <section id="verify"><h2>Verify the result</h2><ul class="checklist"><li>Activate the tunnel and confirm that websites load.</li><li>Check that your public IPv4 address is the server’s address.</li><li>Check DNS and IPv6 behavior on the device that imported the profile.</li><li>Reboot the server and confirm that the tunnel reconnects.</li><li>Test your own SSH key and provider console before relying on hardened access.</li></ul><p>A WireGuard handshake proves that two peers exchanged packets. It does not prove that every route, DNS request or application is protected, and it does not create a kill switch when the tunnel is off.</p></section>
+      </article>
+    </main>
+    <footer class="site-footer"><p>FAV is free software licensed under GPLv3.</p><nav class="footer-links"><a href="privacy.html">Privacy</a><a href="https://github.com/Kasbrut/fav">GitHub</a></nav></footer>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+# FAV — peer monitor log rotation (M15-T2). The script
+# already trims events older than 7 days in-place; this rotation acts as a
+# safety net if the trim were ever bypassed.
+
+# create (move + new file), NOT copytruncate: the monitor's 7-day trim
+# replaces the file via tmp+mv, and copytruncate racing that mv could
+# truncate a freshly written file. The monitor reopens on every append, so
+# a moved file never keeps receiving writes. 0640 matches the monitor's
+# umask 027.
+/var/log/fav/events.jsonl {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+    create 0640 root root
+}

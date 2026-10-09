@@ -1,0 +1,8 @@
+# Configuration for `flutter gen-l10n`.
+# The English ARB is the template; the app ships 10 locales (en, it, de, es, fr,
+# pt, ru, tr, uk, zh) — every new key must be added to all of them.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-dir: lib/l10n
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations

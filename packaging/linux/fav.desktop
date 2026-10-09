@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=FAV
+Comment=Provision and manage WireGuard VPN servers
+Exec=fav
+Icon=fav
+Terminal=false
+Categories=Network;Security;
+StartupNotify=true

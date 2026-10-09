@@ -1,0 +1,4 @@
+# Shows the "Sponsor" button on the repository, pointing at the project's
+# donation page (Lightning / Bitcoin — see DONATE.md). The custom link needs
+# no payment-provider enrollment.
+custom: ["https://github.com/Kasbrut/fav/blob/main/DONATE.md"]

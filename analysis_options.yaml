@@ -1,0 +1,20 @@
+# Static analysis configuration.
+#
+# Lint rules follow `very_good_analysis` (see spec section 5.1). Rules can be
+# tuned in the `linter.rules` block below; suppress per line/file with
+# `// ignore:` / `// ignore_for_file:` comments.
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    # Generated localization sources (produced by `flutter gen-l10n`).
+    - lib/l10n/app_localizations*.dart
+    # Generated code (build_runner output), once code generation is in use.
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - build/**
+    - android/**
+    - ios/**
+    - windows/**
+    - macos/**
+    - linux/**

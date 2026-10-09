@@ -1,0 +1,1647 @@
+{
+  "@@locale": "en",
+  "appTitle": "FAV",
+  "@appTitle": {
+    "description": "Application title shown in the OS task switcher."
+  },
+  "serverListTitle": "My servers",
+  "serverListErrorTitle": "Couldn't load your servers",
+  "serverListErrorBody": "Something went wrong while reading your saved servers.",
+  "@serverListTitle": {
+    "description": "Title of the server list screen."
+  },
+  "serverListEmptyTitle": "No servers yet",
+  "@serverListEmptyTitle": {
+    "description": "Empty-state heading on the server list screen."
+  },
+  "serverListEmptyBody": "Connect a Debian or Ubuntu server over SSH and set it up as your own WireGuard VPN.",
+  "actionAddServer": "Add a server",
+  "@serverListEmptyBody": {
+    "description": "Empty-state body text on the server list screen."
+  },
+  "addServerTitle": "Add server",
+  "@addServerTitle": {
+    "description": "Title of the add-server screen."
+  },
+  "actionCancel": "Cancel",
+  "actionRetry": "Retry",
+  "actionConnect": "Connect",
+  "actionTrust": "Trust",
+  "actionConfirm": "Confirm",
+  "actionRemove": "Remove",
+  "actionInstallWireguard": "Install WireGuard",
+  "@actionInstallWireguard": {
+    "description": "Button/menu action that starts the WireGuard installation on an already-registered server."
+  },
+  "actionRemoveServer": "Remove server",
+  "actionReprobe": "Refresh system info",
+  "serverRemoveTitle": "Forget this server?",
+  "serverRemoveMessage": "{label} will be removed only from this app. FAV won't contact the server, so its VPN, services and FAV SSH key will remain unchanged.",
+  "@serverRemoveMessage": {
+    "description": "Confirmation body when removing a server.",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "statusNotInstalled": "Not installed",
+  "lastSeenNever": "Never connected",
+  "lastSeenJustNow": "Just now",
+  "lastSeenMinutesAgo": "{minutes}m ago",
+  "@lastSeenMinutesAgo": {
+    "description": "Relative last-seen time in minutes.",
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lastSeenHoursAgo": "{hours}h ago",
+  "@lastSeenHoursAgo": {
+    "description": "Relative last-seen time in hours.",
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "lastSeenDaysAgo": "{days}d ago",
+  "@lastSeenDaysAgo": {
+    "description": "Relative last-seen time in days.",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldServerName": "Name",
+  "fieldHost": "Host or IP address",
+  "fieldHostHint": "192.168.1.10",
+  "@fieldHostHint": {
+    "description": "Placeholder example shown in the empty server address field."
+  },
+  "fieldHostHelper": "IP address or domain name",
+  "@fieldHostHelper": {
+    "description": "Helper text under the server address field clarifying accepted formats."
+  },
+  "fieldSshPort": "SSH port",
+  "fieldHostAndPort": "Address and port",
+  "fieldUsername": "Username",
+  "fieldPassword": "Password",
+  "actionShowPassword": "Show password",
+  "actionHidePassword": "Hide password",
+  "validationServerName": "Enter a name of 1 to 50 characters.",
+  "validationHost": "Enter a valid IP address or domain name.",
+  "validationPort": "Enter a port between 1 and 65535.",
+  "validationUsername": "Enter a valid Linux username.",
+  "validationPassword": "Enter the password.",
+  "addServerConnecting": "Connecting…",
+  "addServerProbing": "Reading system information…",
+  "addServerSuccess": "Server added.",
+  "hostKeyTitle": "First connection to this server",
+  "hostKeyBody": "You're connecting to {host} for the first time. The app will remember this server's identity and warn you if it ever changes. A change can mean someone is impersonating the server.",
+  "hostKeyBodyRepin": "You've connected to {host} before, but the stored fingerprint uses an older format and cannot be compared. Verify the fingerprint below before continuing — if it does not match what your server shows, do not connect.",
+  "@hostKeyBodyRepin": { "placeholders": { "host": {} }, "description": "Host key dialog body when an MD5-era pin must be re-confirmed after the SHA-256 migration (audit M1)." },
+  "@hostKeyBody": {
+    "description": "Body of the host key confirmation dialog.",
+    "placeholders": {
+      "host": {
+        "type": "String"
+      }
+    }
+  },
+  "hostKeyVerifyToggle": "Verify its identity (advanced)",
+  "@hostKeyVerifyToggle": {
+    "description": "Label for the collapsible section that reveals the raw host-key fingerprint for manual verification."
+  },
+  "hostKeyVerifyHint": "If your server provider shows a fingerprint in its console, check that it matches the one below.",
+  "@hostKeyVerifyHint": {
+    "description": "Instruction shown inside the advanced host-key verification section."
+  },
+  "hostKeyWhatIsThis": "What is a fingerprint?",
+  "@hostKeyWhatIsThis": {
+    "description": "Link inside the host-key dialog that opens the glossary entry for fingerprints."
+  },
+  "hostKeyFieldType": "Key type",
+  "hostKeyFieldFingerprint": "Fingerprint",
+  "hostKeyReplaceAction": "Replace trusted fingerprint",
+  "hostKeyChangedTitle": "Server identity changed",
+  "hostKeyReplaceTitle": "Replace trusted server identity?",
+  "hostKeyReplaceBody": "Only continue if you intentionally changed the server's SSH host key. Verify the new fingerprint through your provider console or another trusted channel before replacing it.",
+  "hostKeyReplaceCurrent": "Currently trusted",
+  "hostKeyReplaceNew": "New fingerprint",
+  "hostKeyReplaceConfirm": "Replace fingerprint",
+  "hostKeyReplaceUnchanged": "The server fingerprint has not changed.",
+  "hostKeyReplaceSuccess": "The new server fingerprint was verified and saved.",
+  "passwordPromptTitle": "Server password",
+  "passwordPromptBody": "Enter the password you use to log in to {target}.",
+  "passwordPromptHint": "Used only for this connection. It's never saved on your device.",
+  "@passwordPromptHint": {
+    "description": "Reassurance shown below the password field that the password is not stored."
+  },
+  "@passwordPromptBody": {
+    "description": "Body of the password prompt dialog.",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "detailSectionSystem": "System",
+  "detailSectionConnection": "Connection",
+  "detailSectionWireguard": "WireGuard",
+  "metaOs": "Operating system",
+  "metaKernel": "Kernel",
+  "metaArchitecture": "Architecture",
+  "metaMemory": "Memory",
+  "metaCpu": "CPU cores",
+  "metaPublicIp": "Public IP",
+  "metaInterfaces": "Network interfaces",
+  "metaHostname": "Hostname",
+  "metaLastSeen": "Last seen",
+  "metaAddedOn": "Added on",
+  "detailNotProbed": "System information is not available yet.",
+  "detailNotInstalled": "WireGuard is not installed on this server yet.",
+  "detailServerNotFound": "Server not found.",
+  "detailTitle": "Server",
+  "statusHardened": "Hardened",
+  "detailWgInterface": "Interface",
+  "detailWgSubnet": "Subnet",
+  "detailWgPeers": "Peers",
+  "detailSectionFingerprint": "SSH fingerprint (pinned)",
+  "detailFingerprintMeta": "{keyType} · pinned {date}",
+  "@detailFingerprintMeta": {
+    "description": "Sub-line under the pinned SSH host-key fingerprint.",
+    "placeholders": {
+      "keyType": {"type": "String"},
+      "date": {"type": "String"}
+    }
+  },
+  "reprobeSuccess": "System information updated.",
+  "errConnHostUnreachable": "Cannot reach the server. Check the IP address and your connection.",
+  "@errConnHostUnreachable": {
+    "description": "User message for error ERR-CONN-01."
+  },
+  "errConnHostUnreachableCause": "Your device can reach the Internet, but it cannot reach the server's address. The address may be wrong, the server may be powered off, or a firewall between you and the server may be blocking traffic.",
+  "@errConnHostUnreachableCause": {
+    "description": "Cause text for ERR-CONN-01 on the troubleshooting card."
+  },
+  "errConnHostUnreachableFix": "Double-check the IP address or hostname of the server. Make sure the server is running, and if it is hosted on a cloud provider, verify that the provider's firewall allows incoming connections from your IP.",
+  "@errConnHostUnreachableFix": {
+    "description": "Fix text for ERR-CONN-01 on the troubleshooting card."
+  },
+  "errConnSshPortClosed": "The SSH port is not responding.",
+  "@errConnSshPortClosed": {
+    "description": "User message for error ERR-CONN-02."
+  },
+  "errConnSshPortClosedCause": "The server is reachable, but the SSH port does not respond. SSH may be turned off on the server, or a firewall is blocking that specific port.",
+  "@errConnSshPortClosedCause": {
+    "description": "Cause text for ERR-CONN-02 on the troubleshooting card."
+  },
+  "errConnSshPortClosedFix": "Make sure the SSH service is running on the server. Most cloud providers leave it on by default. Then check your firewall rules and confirm that the SSH port is allowed for inbound connections.",
+  "@errConnSshPortClosedFix": {
+    "description": "Fix text for ERR-CONN-02 on the troubleshooting card."
+  },
+  "errConnAddressNotFound": "No server found at that address.",
+  "@errConnAddressNotFound": {
+    "description": "User message for error ERR-CONN-03."
+  },
+  "errConnAddressNotFoundCause": "The address you entered could not be looked up, so it points to no server. The IP address or domain name is most likely mistyped, or the domain no longer resolves.",
+  "@errConnAddressNotFoundCause": {
+    "description": "Cause text for ERR-CONN-03 on the troubleshooting card."
+  },
+  "errConnAddressNotFoundFix": "Check the address for typos. Use the server's IP address (for example 192.168.1.10) or its full domain name (for example vpn.example.com). If you use a dynamic-DNS name, confirm it still points to the server.",
+  "@errConnAddressNotFoundFix": {
+    "description": "Fix text for ERR-CONN-03 on the troubleshooting card."
+  },
+  "errAuthInvalidCredentials": "Incorrect username or password.",
+  "@errAuthInvalidCredentials": {
+    "description": "User message for error ERR-AUTH-01."
+  },
+  "errAuthInvalidCredentialsCause": "The username or password you entered was refused by the server. This can also happen if the account is temporarily locked after too many failed attempts.",
+  "@errAuthInvalidCredentialsCause": {
+    "description": "Cause text for ERR-AUTH-01 on the troubleshooting card."
+  },
+  "errAuthInvalidCredentialsFix": "Re-enter the credentials carefully — passwords are case-sensitive. If you keep getting this error, wait a few minutes (some servers lock an account after repeated failures) and try again.",
+  "@errAuthInvalidCredentialsFix": {
+    "description": "Fix text for ERR-AUTH-01 on the troubleshooting card."
+  },
+  "errAuthNoSudo": "The user does not have the required sudo permissions.",
+  "@errAuthNoSudo": {
+    "description": "User message for error ERR-AUTH-02."
+  },
+  "errAuthNoSudoCause": "The account you used to log in exists on the server but does not have permission to run commands as administrator (sudo). The installer needs those elevated permissions to configure the system.",
+  "@errAuthNoSudoCause": {
+    "description": "Cause text for ERR-AUTH-02 on the troubleshooting card."
+  },
+  "errAuthNoSudoFix": "Log in to the server with an account that has sudo access, or ask the server administrator to grant sudo permissions to this account. Then try connecting again.",
+  "@errAuthNoSudoFix": {
+    "description": "Fix text for ERR-AUTH-02 on the troubleshooting card."
+  },
+  "errHostKeyMismatch": "The server identity has changed. Possible MITM attack.",
+  "@errHostKeyMismatch": {
+    "description": "User message for error ERR-HOST-01."
+  },
+  "errHostKeyMismatchCause": "The cryptographic fingerprint stored for this server no longer matches what the server is presenting. This can happen after a server rebuild or OS reinstall, but it is also a sign of a potential man-in-the-middle attack.",
+  "@errHostKeyMismatchCause": {
+    "description": "Cause text for ERR-HOST-01 on the troubleshooting card."
+  },
+  "errHostKeyMismatchFix": "If the change was unexpected, do not reconnect. If you changed the server intentionally, verify the new fingerprint through your provider console. In the server details, refresh the system information if needed, then use Replace fingerprint and authenticate to update the pinned identity.",
+  "@errHostKeyMismatchFix": {
+    "description": "Fix text for ERR-HOST-01 on the troubleshooting card."
+  },
+  "errSysUnsupportedDistro": "Unsupported OS. Debian or Ubuntu is required.",
+  "@errSysUnsupportedDistro": {
+    "description": "User message for error ERR-SYS-01."
+  },
+  "errSysUnsupportedDistroCause": "The installer only supports Debian and Ubuntu. The server is running a different Linux distribution that is not compatible with the provisioning scripts.",
+  "@errSysUnsupportedDistroCause": {
+    "description": "Cause text for ERR-SYS-01 on the troubleshooting card."
+  },
+  "errSysUnsupportedDistroFix": "Reinstall the server with a supported operating system — a recent version of Debian or Ubuntu is recommended. Then try provisioning again.",
+  "@errSysUnsupportedDistroFix": {
+    "description": "Fix text for ERR-SYS-01 on the troubleshooting card."
+  },
+  "errSysKernelTooOld": "The kernel is not compatible with WireGuard.",
+  "@errSysKernelTooOld": {
+    "description": "User message for error ERR-SYS-02."
+  },
+  "errSysKernelTooOldCause": "WireGuard requires a Linux kernel version that includes the WireGuard module. The server's current kernel is older than that minimum and cannot run WireGuard natively.",
+  "@errSysKernelTooOldCause": {
+    "description": "Cause text for ERR-SYS-02 on the troubleshooting card."
+  },
+  "errSysKernelTooOldFix": "Update the server to a newer version of Debian or Ubuntu that ships with a compatible kernel. After the upgrade, try provisioning again.",
+  "@errSysKernelTooOldFix": {
+    "description": "Fix text for ERR-SYS-02 on the troubleshooting card."
+  },
+  "errRunLost": "The run was lost (reboot or cleanup). Start a new installation.",
+  "@errRunLost": {
+    "description": "User message for error ERR-RUN-01."
+  },
+  "errRunLostCause": "The installation was running on the server in the background, but the files tracking its progress are no longer there. This usually means the server was rebooted or the temporary files were cleaned up before the run finished.",
+  "@errRunLostCause": {
+    "description": "Cause text for ERR-RUN-01 on the troubleshooting card."
+  },
+  "errRunLostFix": "The installer can be run multiple times safely — steps that already completed will be skipped automatically. Reopen the server detail and start a new installation; it will pick up from a safe point.",
+  "@errRunLostFix": {
+    "description": "Fix text for ERR-RUN-01 on the troubleshooting card."
+  },
+  "errRunStepFailed": "Step {stepName} failed. See details.",
+  "@errRunStepFailed": {
+    "description": "User message for error ERR-RUN-02.",
+    "placeholders": {
+      "stepName": {
+        "type": "String"
+      }
+    }
+  },
+  "errRunStepFailedCause": "One of the installation steps encountered an error on the server. This can be caused by a package manager issue, a transient network hiccup while downloading packages, or a configuration conflict left from a previous partial install.",
+  "@errRunStepFailedCause": {
+    "description": "Cause text for ERR-RUN-02 on the troubleshooting card."
+  },
+  "errRunStepFailedFix": "Review the technical details below for the specific step and error message. If the problem looks like a temporary network issue, starting the installation again is safe. If the error persists, look at the installer log on the server for more context.",
+  "@errRunStepFailedFix": {
+    "description": "Fix text for ERR-RUN-02 on the troubleshooting card."
+  },
+  "errLockoutAborted": "Root SSH disabling was cancelled to avoid a lockout. The server is intact.",
+  "@errLockoutAborted": {
+    "description": "User message for error ERR-LCK-01."
+  },
+  "errLockoutAbortedCause": "The app tried to disable direct root SSH access as a security step, but the safety checks did not pass — the new admin account could not be verified, or the SSH configuration test failed. To protect you from losing access to the server, the change was cancelled.",
+  "@errLockoutAbortedCause": {
+    "description": "Cause text for ERR-LCK-01 on the troubleshooting card."
+  },
+  "errLockoutAbortedFix": "Check that the admin account created during hardening can log in successfully before retrying. The server remains accessible with its current credentials — no access has been lost.",
+  "@errLockoutAbortedFix": {
+    "description": "Fix text for ERR-LCK-01 on the troubleshooting card."
+  },
+  "errPasswordTooWeak": "The new password does not meet the minimum requirements.",
+  "@errPasswordTooWeak": {
+    "description": "User message for error ERR-PWD-01."
+  },
+  "errPasswordTooWeakCause": "The password you entered is too simple and could be guessed easily. Strong passwords protect the server from unauthorised access.",
+  "@errPasswordTooWeakCause": {
+    "description": "Cause text for ERR-PWD-01 on the troubleshooting card."
+  },
+  "errPasswordTooWeakFix": "Choose a longer password that mixes letters, numbers and symbols, and avoid common words or predictable patterns. A passphrase made of several random words also works well.",
+  "@errPasswordTooWeakFix": {
+    "description": "Fix text for ERR-PWD-01 on the troubleshooting card."
+  },
+  "errNetNoInternet": "The server has no Internet access.",
+  "@errNetNoInternet": {
+    "description": "User message for error ERR-NET-01."
+  },
+  "errNetNoInternetCause": "The server can be reached over SSH, but it cannot connect to the Internet. The installer needs to download WireGuard packages during setup, so this blocks the installation.",
+  "@errNetNoInternetCause": {
+    "description": "Cause text for ERR-NET-01 on the troubleshooting card."
+  },
+  "errNetNoInternetFix": "Check the server's network configuration and make sure outbound Internet access is allowed. If the server is behind a firewall, verify that outbound traffic on standard ports is permitted. Once connectivity is restored, try the installation again.",
+  "@errNetNoInternetFix": {
+    "description": "Fix text for ERR-NET-01 on the troubleshooting card."
+  },
+  "errScriptInvalid": "The custom script has syntax errors.",
+  "@errScriptInvalid": {
+    "description": "User message for error ERR-SCRIPT-01."
+  },
+  "errScriptInvalidCause": "The custom script you provided contains syntax errors. The app checks scripts before sending them to the server, and this one did not pass the check.",
+  "@errScriptInvalidCause": {
+    "description": "Cause text for ERR-SCRIPT-01 on the troubleshooting card."
+  },
+  "errScriptInvalidFix": "Open the script editor and look for the lines highlighted as problematic. Fix the syntax errors and save the script before trying again.",
+  "@errScriptInvalidFix": {
+    "description": "Fix text for ERR-SCRIPT-01 on the troubleshooting card."
+  },
+  "errPollingTimeout": "No response from the server for too long.",
+  "@errPollingTimeout": {
+    "description": "User message for error ERR-TMO-01."
+  },
+  "errPollingTimeoutCause": "The app was waiting for a progress update from the server, but none arrived within the allowed time. The installation may still be running — the server could be under heavy load, or the connection may have been lost.",
+  "@errPollingTimeoutCause": {
+    "description": "Cause text for ERR-TMO-01 on the troubleshooting card."
+  },
+  "errPollingTimeoutFix": "Reopen the server detail screen. If the installation is still in progress, the app will reconnect and resume tracking it. If the server appears stuck, you can start a new installation — it is safe to run again.",
+  "@errPollingTimeoutFix": {
+    "description": "Fix text for ERR-TMO-01 on the troubleshooting card."
+  },
+  "errSshKeyUnavailable": "The SSH key for this server is missing from the device keychain. Password login has been disabled on the server, so manual recovery on the server is required.",
+  "@errSshKeyUnavailable": {
+    "description": "User message for error ERR-KEY-01 — stored SSH key missing after hardening."
+  },
+  "errSshKeyUnavailableCause": "During server hardening, this app generated an SSH key pair and disabled password login on the server. The private key was saved in this device's secure keychain, but it is no longer there — possibly because the app data was cleared or the device was restored from a backup.",
+  "@errSshKeyUnavailableCause": {
+    "description": "Cause text for ERR-KEY-01 on the troubleshooting card."
+  },
+  "errSshKeyUnavailableFix": "Because password login is disabled and the app's SSH key is gone, you cannot log in remotely anymore. You will need direct access to the server (such as your cloud provider's web console or a VNC session) to reset the configuration. As a quick rescue, your provider's recovery mode or a snapshot from before the hardening step can also restore access.",
+  "@errSshKeyUnavailableFix": {
+    "description": "Fix text for ERR-KEY-01 on the troubleshooting card."
+  },
+  "errSshKeyDeployFailed": "The SSH key could not be saved on the server.",
+  "@errSshKeyDeployFailed": {
+    "description": "User message for error ERR-KEY-02 — writing to authorized_keys failed."
+  },
+  "errSshKeyDeployFailedCause": "The app connected to the server but the command that adds the key to the account's authorized_keys file returned an error — for example the home directory is not writable or the disk is full.",
+  "@errSshKeyDeployFailedCause": {
+    "description": "Cause text for ERR-KEY-02 on the troubleshooting card."
+  },
+  "errSshKeyDeployFailedFix": "Check that the login account's home directory exists and is writable and that the server has free disk space, then try again.",
+  "@errSshKeyDeployFailedFix": {
+    "description": "Fix text for ERR-KEY-02 on the troubleshooting card."
+  },
+  "errMonitorSnapshotInvalid": "The monitor snapshot could not be parsed.",
+  "@errMonitorSnapshotInvalid": {
+    "description": "User message for error ERR-MON-01 — peers-state.json failed to parse."
+  },
+  "errMonitorSnapshotInvalidCause": "The monitoring agent on the server wrote a status file that the app could not read. This can happen if the file was partially written during a write cycle or if the agent encountered an unexpected error.",
+  "@errMonitorSnapshotInvalidCause": {
+    "description": "Cause text for ERR-MON-01 on the troubleshooting card."
+  },
+  "errMonitorSnapshotInvalidFix": "Wait a moment and refresh — the agent writes a new snapshot every minute and the next one should be valid. If the problem continues, try reinstalling the monitoring agent from the server settings.",
+  "@errMonitorSnapshotInvalidFix": {
+    "description": "Fix text for ERR-MON-01 on the troubleshooting card."
+  },
+  "errMonitorAgentNotInstalled": "The monitoring agent is not installed on this server.",
+  "@errMonitorAgentNotInstalled": {
+    "description": "User message for error ERR-MON-02 — snapshot file missing on the server."
+  },
+  "errMonitorAgentNotInstalledCause": "Live peer status requires a small monitoring agent running on the server, but it has not been set up yet on this server.",
+  "@errMonitorAgentNotInstalledCause": {
+    "description": "Cause text for ERR-MON-02 on the troubleshooting card."
+  },
+  "errMonitorAgentNotInstalledFix": "The VPN still works without monitoring. If monitoring is required, check the installation log and the monitor service on the server, or remove and provision the server again with monitoring enabled.",
+  "@errMonitorAgentNotInstalledFix": {
+    "description": "Fix text for ERR-MON-02 on the troubleshooting card."
+  },
+  "errMonitorPullFailed": "The latest monitoring snapshot could not be fetched.",
+  "@errMonitorPullFailed": {
+    "description": "User message for error ERR-MON-03 — SSH pull failure during polling."
+  },
+  "errMonitorPullFailedCause": "The app connects to the server over SSH to read the latest monitoring data, but this connection attempt failed. The server may be temporarily unreachable, or the SSH session may have been interrupted.",
+  "@errMonitorPullFailedCause": {
+    "description": "Cause text for ERR-MON-03 on the troubleshooting card."
+  },
+  "errMonitorPullFailedFix": "Check your network connection and make sure the server is reachable. The app will retry automatically — if the error persists, check the server connectivity from the detail screen.",
+  "@errMonitorPullFailedFix": {
+    "description": "Fix text for ERR-MON-03 on the troubleshooting card."
+  },
+  "errMonitorAgentStale": "The monitoring agent has not reported recently.",
+  "@errMonitorAgentStale": {
+    "description": "User message for error ERR-MON-04 — agent snapshot older than 90s."
+  },
+  "errMonitorAgentStaleCause": "The monitoring agent is installed and was working, but its last status report is older than expected. The agent's timer task may have stopped or the system could be under very high load.",
+  "@errMonitorAgentStaleCause": {
+    "description": "Cause text for ERR-MON-04 on the troubleshooting card."
+  },
+  "errMonitorAgentStaleFix": "Wait a minute and refresh. If the status remains stale, check the FAV monitor service and timer on the server. The VPN itself can remain usable while monitoring is unavailable.",
+  "@errMonitorAgentStaleFix": {
+    "description": "Fix text for ERR-MON-04 on the troubleshooting card."
+  },
+  "errPeerLabelInvalid": "Use letters, numbers, spaces and ._- only, 1 to 32 characters.",
+  "@errPeerLabelInvalid": {
+    "description": "User message for error ERR-PEER-01 — invalid peer label."
+  },
+  "errPeerLabelInvalidCause": "The label you chose for this peer contains characters that are not allowed, or it is outside the permitted length of 1 to 32 characters.",
+  "@errPeerLabelInvalidCause": {
+    "description": "Cause text for ERR-PEER-01 on the troubleshooting card."
+  },
+  "errPeerLabelInvalidFix": "Enter a label using only letters, numbers, spaces, dots, underscores and hyphens, keeping it between 1 and 32 characters long.",
+  "@errPeerLabelInvalidFix": {
+    "description": "Fix text for ERR-PEER-01 on the troubleshooting card."
+  },
+  "errPeerSubnetExhausted": "No free address left in the VPN subnet. Revoke an unused peer to free up an address.",
+  "@errPeerSubnetExhausted": {
+    "description": "User message for error ERR-PEER-02 — VPN /24 is full."
+  },
+  "errPeerSubnetExhaustedCause": "The VPN subnet used by this server has run out of available IP addresses. Every address in the range is already assigned to an existing peer.",
+  "@errPeerSubnetExhaustedCause": {
+    "description": "Cause text for ERR-PEER-02 on the troubleshooting card."
+  },
+  "errPeerSubnetExhaustedFix": "Go to the peers list and revoke a peer that is no longer needed. This frees its address and allows you to add a new one.",
+  "@errPeerSubnetExhaustedFix": {
+    "description": "Fix text for ERR-PEER-02 on the troubleshooting card."
+  },
+  "errPeerApplyFailed": "The server accepted the configuration but the peer didn't come up. The change was rolled back. Try again, or check the server's WireGuard service.",
+  "@errPeerApplyFailed": {
+    "description": "User message for error ERR-PEER-03 — wg set did not take effect."
+  },
+  "errPeerApplyFailedCause": "The configuration for the new peer was written successfully, but when the server applied it to the running WireGuard interface the peer did not appear as expected. The server automatically rolled back the change to keep the VPN consistent.",
+  "@errPeerApplyFailedCause": {
+    "description": "Cause text for ERR-PEER-03 on the troubleshooting card."
+  },
+  "errPeerApplyFailedFix": "Try adding the peer again — the rollback means the server is in a clean state. If the error repeats, the WireGuard service on the server may need attention; check the server's system logs for more detail.",
+  "@errPeerApplyFailedFix": {
+    "description": "Fix text for ERR-PEER-03 on the troubleshooting card."
+  },
+  "errPeerNotFound": "The peer was not found on the server. The local profile was removed anyway.",
+  "@errPeerNotFound": {
+    "description": "User message for error ERR-PEER-04 — peer absent at revoke time."
+  },
+  "errPeerNotFoundCause": "When the app tried to revoke this peer, the peer was already absent from the server's WireGuard configuration. This can happen if the peer was removed directly on the server, or if a previous revoke attempt partially succeeded.",
+  "@errPeerNotFoundCause": {
+    "description": "Cause text for ERR-PEER-04 on the troubleshooting card."
+  },
+  "errPeerNotFoundFix": "No action is needed — the peer is gone from the server and the app has cleaned up the local record. Everything is consistent.",
+  "@errPeerNotFoundFix": {
+    "description": "Fix text for ERR-PEER-04 on the troubleshooting card."
+  },
+  "errPeerParseFailed": "Unexpected response from the server. The peer may or may not have been created — re-open the server to refresh.",
+  "@errPeerParseFailed": {
+    "description": "User message for error ERR-PEER-05 — server stdout did not match the envelope shape."
+  },
+  "errPeerParseFailedCause": "The server ran the script to add the peer, but the response it sent back was not in the expected format. This is unusual and may point to a script error or unexpected output from another process on the server.",
+  "@errPeerParseFailedCause": {
+    "description": "Cause text for ERR-PEER-05 on the troubleshooting card."
+  },
+  "errPeerParseFailedFix": "Reopen the server detail screen to see the current list of peers. If the peer appears in the list, it was created successfully and no further action is needed. If it is missing, try adding it again.",
+  "@errPeerParseFailedFix": {
+    "description": "Fix text for ERR-PEER-05 on the troubleshooting card."
+  },
+  "errTeardownFailed": "The teardown could not complete on the server.",
+  "@errTeardownFailed": {
+    "description": "Error shown when the remote server teardown fails."
+  },
+  "errTeardownFailedCause": "A teardown step failed, or the connection dropped before it finished.",
+  "@errTeardownFailedCause": {
+    "description": "Cause text for the teardown-failed error help card."
+  },
+  "errTeardownFailedFix": "Retry the removal, or remove the server from the app and clean the machine up manually.",
+  "@errTeardownFailedFix": {
+    "description": "Fix text for the teardown-failed error help card."
+  },
+  "teardownTitle": "Remove server",
+  "@teardownTitle": { "description": "Title of the server removal / teardown modal." },
+  "teardownMessage": "Remove {label} from the app. Optionally clean up what FAV installed on the server.",
+  "@teardownMessage": {
+    "description": "Body of the teardown modal.",
+    "placeholders": { "label": { "type": "String" } }
+  },
+  "teardownServicesOption": "Remove VPN & services from the server",
+  "@teardownServicesOption": { "description": "Checkbox: run the detached services teardown." },
+  "teardownServicesHint": "Stops and removes WireGuard, the monitor agent, the NAT rule and IP forwarding that FAV added. Packages and the login user are left in place.",
+  "@teardownServicesHint": { "description": "Helper text under the services checkbox." },
+  "teardownReopenOption": "Re-open SSH access (undo hardening)",
+  "@teardownReopenOption": { "description": "Checkbox: reverse the SSH hardening." },
+  "teardownReopenWarning": "Re-enables root and/or password SSH login, lowering the server's security. Only do this if you understand the risk.",
+  "@teardownReopenWarning": { "description": "Warning under the re-open SSH checkbox." },
+  "teardownPasswordPromptTarget": "the server (sudo)",
+  "@teardownPasswordPromptTarget": { "description": "Target shown in the password prompt before a teardown (password needed for sudo)." },
+  "teardownLockoutWarning": "This would remove FAV's SSH key while password and root login are disabled and you have registered no other key — you could lose all SSH access to this server.",
+  "@teardownLockoutWarning": { "description": "Anti-lockout guard banner in the teardown modal." },
+  "teardownAddKeyAction": "Add your SSH key first",
+  "@teardownAddKeyAction": { "description": "Guard action: open the add-SSH-key dialog before teardown." },
+  "teardownProgressReopening": "Re-opening SSH access…",
+  "@teardownProgressReopening": { "description": "Progress line while reopen_ssh.sh runs." },
+  "teardownProgressServices": "Removing VPN & services…",
+  "@teardownProgressServices": { "description": "Progress line during the detached services teardown." },
+  "teardownProgressRemovingKey": "Removing FAV's access…",
+  "@teardownProgressRemovingKey": { "description": "Progress line while the app key is removed." },
+  "teardownFailedTitle": "Teardown failed",
+  "@teardownFailedTitle": { "description": "Heading of the teardown failure view." },
+  "teardownRetryAction": "Retry",
+  "@teardownRetryAction": { "description": "Retry the failed teardown." },
+  "teardownDisconnectAction": "Disconnect FAV and remove",
+  "@teardownDisconnectAction": { "description": "Connect, remove FAV's SSH key, then remove the local record while leaving VPN services running." },
+  "teardownUninstallAction": "Uninstall and remove",
+  "@teardownUninstallAction": { "description": "Remove FAV-installed VPN services and access, then remove the local record." },
+  "teardownDisconnectSummary": "WireGuard keeps running. FAV will connect only to remove its SSH key, then forget this server.",
+  "@teardownDisconnectSummary": { "description": "Outcome summary when remote VPN cleanup is not selected." },
+  "teardownUninstallSummary": "FAV will remove the VPN and services it installed, remove its SSH key, then forget this server.",
+  "@teardownUninstallSummary": { "description": "Outcome summary when remote VPN cleanup is selected." },
+  "teardownRemoveLocallyAction": "Forget without contacting server",
+  "@teardownRemoveLocallyAction": { "description": "Skip remote teardown and remove only the local record." },
+  "teardownRemoveLocallyConfirmAction": "Forget locally",
+  "@teardownRemoveLocallyConfirmAction": { "description": "Confirm local-only removal without contacting the server." },
+  "teardownDoneSnackbar": "{label} removed.",
+  "@teardownDoneSnackbar": {
+    "description": "Snackbar after a successful teardown/removal.",
+    "placeholders": { "label": { "type": "String" } }
+  },
+  "peersSectionTitle": "Peers",
+  "peersEmptyHint": "No peers yet. Add one to get a client profile.",
+  "peerFirstClientLabel": "First client",
+  "peerHandshakeRecent": "Connected",
+  "peerHandshakeStale": "Disconnected",
+  "actionAddPeer": "Add peer",
+  "actionRenamePeer": "Rename",
+  "actionRevokePeer": "Revoke",
+  "actionPeerOptions": "Peer options",
+  "peerStatusOnline": "Online",
+  "peerStatusOffline": "Offline",
+  "addPeerScreenTitle": "Add peer",
+  "addPeerLabelLabel": "Label",
+  "addPeerLabelHint": "e.g. phone, laptop",
+  "addPeerSubmitting": "Adding peer…",
+  "peerRevokedSnack": "{label} revoked",
+  "wireguardPortBlockedTitle": "WireGuard port may be blocked",
+  "wireguardPortBlockedMessage": "The server did not receive the test packet on UDP port {port}. Allow this port in your provider or cloud firewall before connecting a device.",
+  "@wireguardPortBlockedMessage": {"placeholders": {"port": {"type": "int"}}},
+  "actionOpenFirewallGuide": "Open firewall guide",
+  "actionCheckPortAgain": "Check again",
+  "detailWgPortStatus": "UDP port status",
+  "wireguardPortReachable": "Reachable",
+  "wireguardPortBlocked": "Blocked",
+  "wireguardPortNotChecked": "Not checked",
+  "wireguardPortStatusChecked": "{status} · checked {date}",
+  "@wireguardPortStatusChecked": {"placeholders": {"status": {"type": "String"}, "date": {"type": "String"}}},
+  "wireguardPortCheckUnavailable": "The port could not be checked. Verify SSH and sudo access, then try again.",
+  "@peerRevokedSnack": {
+    "description": "Snackbar confirming a peer was revoked on the server.",
+    "placeholders": {"label": {"type": "String"}}
+  },
+  "addPeerSuccessSnack": "Peer added",
+  "peerRenameDialogTitle": "Rename peer",
+  "peerRevokeConfirmTitle": "Revoke this peer?",
+  "peerRevokeConfirmBody": "This will immediately disconnect the peer and delete its profile from this device. It cannot be undone.",
+  "peerRevokeConfirmAction": "Revoke",
+  "installProgressTitle": "Installing WireGuard",
+  "installPreparing": "Connecting to your server…",
+  "installCancelTitle": "Cancel installation?",
+  "installCancelMessage": "The installation in progress will be stopped.",
+  "installSuccessTitle": "WireGuard installed",
+  "installSuccessBody": "The server is now a WireGuard endpoint.",
+  "installFailedTitle": "Installation failed",
+  "installProgressHeader": "Step {current} of {total} · {elapsed} elapsed",
+  "@installProgressHeader": {
+    "description": "Progress summary above the install step list.",
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"},
+      "elapsed": {"type": "String"}
+    }
+  },
+  "installRunReference": "run {runId}",
+  "@installRunReference": {
+    "description": "Short run identifier shown in the install screen subtitle.",
+    "placeholders": {"runId": {"type": "String"}}
+  },
+  "stepInProgress": "In progress",
+  "stepStatusPending": "Not started",
+  "stepStatusRunning": "Running",
+  "stepStatusDone": "Done",
+  "stepStatusError": "Failed",
+  "stepStatusSkipped": "Skipped",
+  "installStepSemantic": "{stepName}, {status}",
+  "@installStepSemantic": {
+    "description": "Screen-reader label for an installation step, combining its name and status.",
+    "placeholders": {
+      "stepName": {"type": "String"},
+      "status": {"type": "String"}
+    }
+  },
+  "stepDurationSeconds": "{count}s",
+  "@stepDurationSeconds": {
+    "description": "A step duration expressed in seconds.",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "stepDurationMinutes": "{count}m",
+  "@stepDurationMinutes": {
+    "description": "A step duration expressed in whole minutes.",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "stepProbe": "System probe",
+  "stepInstallPkgs": "Install packages",
+  "stepCreateUser": "Create user",
+  "stepDeployAppKey": "Deploy app key",
+  "stepGenerateKeys": "Generate keys",
+  "stepWriteServerConf": "Write server configuration",
+  "stepEnableForwarding": "Enable IP forwarding",
+  "stepFirewall": "Configure firewall",
+  "stepStartService": "Start service",
+  "stepHardening": "Apply hardening",
+  "stepHealthCheck": "Health check",
+  "stepFinalize": "Finalize",
+  "scriptHashLabel": "Script SHA-256",
+  "runDetailsTitle": "Run details",
+  "@runDetailsTitle": {
+    "description": "Collapsible section on the install progress screen holding diagnostic info (script hash, full log)."
+  },
+  "scriptModifiedBanner": "This run uses a customized installation script.",
+  "scriptEditorTitle": "Installation script",
+  "advancedScriptTileSubtitle": "The exact commands that run on your server.",
+  "scriptEditorDefault": "Default",
+  "scriptEditorModifiedBadge": "Customized",
+  "scriptEditorRestore": "Restore default",
+  "scriptEditorDiff": "Diff",
+  "scriptEditorShowCode": "Editor",
+  "scriptEditorNoDiff": "No changes from the default script.",
+  "actionCustomize": "Customize",
+  "scriptEditorMeta": "bash · {count} lines",
+  "@scriptEditorMeta": {
+    "description": "Language and line-count label in the script editor.",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "scriptEditorReadOnly": "Read-only",
+  "@scriptEditorReadOnly": {
+    "description": "Badge marking a bundled script that cannot be edited yet."
+  },
+  "scriptEditorEditingBadge": "Editing",
+  "@scriptEditorEditingBadge": {
+    "description": "Badge shown while the user is editing the script."
+  },
+  "scriptEditorModuleLocked": "Editing this script isn't available yet.",
+  "@scriptEditorModuleLocked": {
+    "description": "Note shown for read-only bundled scripts that can be viewed but not edited."
+  },
+  "scriptEditorVerify": "Verify (SHA-256)",
+  "@scriptEditorVerify": {
+    "description": "Label for the collapsible section that reveals the script's SHA-256 hash."
+  },
+  "scriptHashCopied": "SHA-256 copied to clipboard.",
+  "@scriptHashCopied": {
+    "description": "Snackbar confirmation after copying the script hash."
+  },
+  "scriptEditorDiscard": "Discard changes",
+  "@scriptEditorDiscard": {
+    "description": "Button that exits editing without saving."
+  },
+  "scriptEditorViewChanges": "View changes",
+  "@scriptEditorViewChanges": {
+    "description": "Button that opens the diff against the default script."
+  },
+  "scriptEditorHideChanges": "Hide changes",
+  "@scriptEditorHideChanges": {
+    "description": "Button that closes the diff and returns to the script."
+  },
+  "scriptEditorRestoreConfirmTitle": "Restore the default script?",
+  "@scriptEditorRestoreConfirmTitle": {
+    "description": "Title of the confirmation dialog for restoring the default script."
+  },
+  "scriptEditorRestoreConfirmBody": "Your customizations will be discarded.",
+  "@scriptEditorRestoreConfirmBody": {
+    "description": "Body of the confirmation dialog for restoring the default script."
+  },
+  "scriptEditorChooseFile": "Choose a script",
+  "@scriptEditorChooseFile": {
+    "description": "Title of the bottom sheet that lists the bundled scripts."
+  },
+  "scriptGroupInstaller": "Installer",
+  "@scriptGroupInstaller": {
+    "description": "Group heading for the orchestrator, library, and installer modules."
+  },
+  "scriptGroupHardening": "Hardening",
+  "@scriptGroupHardening": {
+    "description": "Group heading for the standalone SSH-hardening scripts."
+  },
+  "scriptGroupMonitoring": "Monitoring",
+  "@scriptGroupMonitoring": {
+    "description": "Group heading for the monitoring agent scripts and units."
+  },
+  "scriptGroupPeers": "Peers",
+  "@scriptGroupPeers": {
+    "description": "Group heading for the peer add/revoke scripts."
+  },
+  "scriptEditorSaved": "Changes saved",
+  "@scriptEditorSaved": {
+    "description": "Snackbar confirmation after saving an edited script."
+  },
+  "scriptEditorRestoreAll": "Restore all originals",
+  "@scriptEditorRestoreAll": {
+    "description": "Overflow action that deletes every script override."
+  },
+  "scriptEditorRestoreAllConfirmTitle": "Restore every script?",
+  "@scriptEditorRestoreAllConfirmTitle": {
+    "description": "Title of the confirmation dialog for restoring all scripts."
+  },
+  "scriptEditorRestoreAllConfirmBody": "All your script customizations will be discarded. Servers, peers and preferences are not affected.",
+  "@scriptEditorRestoreAllConfirmBody": {
+    "description": "Body of the confirmation dialog for restoring all scripts."
+  },
+  "scriptEditorRestoreAllDone": "All scripts restored to their originals",
+  "@scriptEditorRestoreAllDone": {
+    "description": "Snackbar confirmation after restoring all scripts."
+  },
+  "runConnectionLost": "Connection lost — retrying…",
+  "runViewLog": "View full log",
+  "runLogTitle": "Installation log",
+  "logCopied": "Log copied to clipboard.",
+  "@logCopied": {
+    "description": "Snackbar confirmation after copying the installation log."
+  },
+  "errorTechnicalDetails": "Technical details",
+  "@errorTechnicalDetails": {
+    "description": "Collapsible section on the failure screen holding the technical error detail, full log, and cleanup tools."
+  },
+  "actionRestartInstall": "Restart from scratch",
+  "actionEditConnection": "Edit connection",
+  "actionBackToServers": "Back to servers",
+  "@actionBackToServers": {
+    "description": "Secondary action on the failure screen that returns to the server list."
+  },
+  "actionCleanup": "Attempt cleanup",
+  "cleanupDone": "Server files removed.",
+  "cleanupFailed": "Cleanup failed — the files may still be on the server.",
+  "@cleanupFailed": {
+    "description": "Snackbar shown when the manual server-files cleanup could not be verified."
+  },
+  "actionDone": "Done",
+  "antiLockoutInProgress": "Disabling root SSH access…",
+  "antiLockoutDisabled": "Root SSH access disabled.",
+  "antiLockoutWarning": "Root SSH was left enabled to prevent a lockout. The server is still reachable as root.",
+  "hardeningInProgress": "Applying SSH hardening…",
+  "hardeningApplied": "SSH password authentication disabled; key-only login is enforced.",
+  "hardeningIncompleteTitle": "SSH hardening was not fully applied",
+  "hardeningWarning": "Password authentication was left enabled because key-based login could not be verified. The server is still reachable as before.",
+  "configBackupDone": "Existing configuration backed up to {path}.",
+  "@configBackupDone": {
+    "description": "Shown after install when a previous config was backed up.",
+    "placeholders": {"path": {"type": "String"}}
+  },
+  "configBackupNone": "No previous configuration was found.",
+  "secondInstallTitle": "WireGuard already installed",
+  "secondInstallMessage": "{label} already has a WireGuard installation. Reinstalling overwrites it. Continue?",
+  "@secondInstallMessage": {
+    "description": "Confirmation body before a second installation.",
+    "placeholders": {"label": {"type": "String"}}
+  },
+  "actionReinstall": "Reinstall",
+  "incompleteRunTitle": "Installation interrupted",
+  "incompleteRunBody": "An installation on {label} did not finish.",
+  "@incompleteRunBody": {
+    "description": "Banner body for a recoverable interrupted run.",
+    "placeholders": {"label": {"type": "String"}}
+  },
+  "incompleteRunMore": "{count, plural, one{1 more installation was also interrupted.} other{{count} more installations were also interrupted.}}",
+  "@incompleteRunMore": {
+    "description": "Appended to the interrupted-run banner when more than one run can be resumed.",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "actionResume": "Resume",
+  "recoveryOrphanedTitle": "Run lost",
+  "recoveryOrphanedMessage": "The run is no longer on the server. Start a new installation.",
+  "recoveryCompletedMessage": "The interrupted installation had already completed.",
+  "actionStartNewInstall": "Start a new installation",
+  "advancedFormTitle": "Advanced options",
+  "fieldWgPort": "WireGuard port",
+  "fieldVpnSubnet": "VPN subnet",
+  "fieldDns": "DNS servers",
+  "fieldMtu": "MTU",
+  "fieldInterfaceName": "Interface name",
+  "fieldPublicEndpoint": "Public endpoint",
+  "fieldEnableHardening": "Enable SSH hardening",
+  "fieldEnableHardeningDescription": "Locks down the whole server: turns off password and root SSH sign-in (key login only) and adds brute-force protection, after checking your login still works.",
+  "@fieldEnableHardeningDescription": {
+    "description": "Plain-language subtitle under the SSH hardening toggle on the advanced form."
+  },
+  "fieldEnableMonitoring": "Install monitoring agent",
+  "@fieldEnableMonitoring": {
+    "description": "Advanced form toggle that installs the WireGuard peer monitoring agent (M15-T7)."
+  },
+  "fieldEnableMonitoringDescription": "Tracks peer connection status so you can see who is connected.",
+  "fieldBackupConfig": "Back up existing configuration",
+  "fieldBackupConfigDescription": "Saves a copy of any existing setup before changes are applied, so it can be restored.",
+  "advancedHardeningNoticeTitle": "Protected against lockout",
+  "advancedHardeningNoticeBody": "Before it turns off password and root SSH sign-in, the installer verifies your key-based login, backs up the SSH configuration, runs a dry-run check, and rolls back automatically if anything fails.",
+  "advancedHardeningLearnMore": "What is SSH hardening?",
+  "advancedOptionsSaved": "Advanced options saved.",
+  "sshKeysSectionTitle": "SSH keys",
+  "@sshKeysSectionTitle": {
+    "description": "Title of the section listing the user's own SSH public keys."
+  },
+  "sshKeysSectionHint": "Add your own public keys to keep SSH access after hardening disables password login.",
+  "@sshKeysSectionHint": {
+    "description": "Explanatory hint under the SSH keys section header."
+  },
+  "sshKeysEmpty": "No SSH keys added yet.",
+  "@sshKeysEmpty": {
+    "description": "Empty state shown when the user has added no SSH keys."
+  },
+  "actionAddSshKey": "Add SSH key",
+  "@actionAddSshKey": {
+    "description": "Button that opens the add-SSH-key dialog."
+  },
+  "sshKeyAddTitle": "Add SSH key",
+  "@sshKeyAddTitle": {
+    "description": "Title of the dialog for adding an SSH public key."
+  },
+  "sshKeyFieldLabel": "Public key",
+  "@sshKeyFieldLabel": {
+    "description": "Label of the SSH public-key paste field."
+  },
+  "sshKeyFieldHint": "ssh-ed25519 AAAA… user@host",
+  "@sshKeyFieldHint": {
+    "description": "Placeholder showing the expected SSH public-key format."
+  },
+  "actionImportFromFile": "Import from file",
+  "@actionImportFromFile": {
+    "description": "Button that imports a public key from a .pub file."
+  },
+  "actionAdd": "Add",
+  "@actionAdd": {
+    "description": "Generic confirm label for an add dialog."
+  },
+  "validationSshPublicKey": "Enter a valid SSH public key (ssh-ed25519, ssh-rsa, ecdsa or sk-).",
+  "@validationSshPublicKey": {
+    "description": "Validation message for an invalid SSH public key."
+  },
+  "sshKeyImportFailed": "Could not read the selected key file.",
+  "@sshKeyImportFailed": {
+    "description": "Error shown when reading an imported .pub file fails."
+  },
+  "sshKeyDuplicate": "That key has already been added.",
+  "@sshKeyDuplicate": {
+    "description": "Snackbar shown when adding a key that is already present."
+  },
+  "sshKeyAddedSnack": "SSH key added.",
+  "@sshKeyAddedSnack": {
+    "description": "Snackbar confirming an SSH key was deployed to the server."
+  },
+  "sshKeyRemovedSnack": "SSH key removed.",
+  "@sshKeyRemovedSnack": {
+    "description": "Snackbar confirming an SSH key was removed from the server."
+  },
+  "sshKeyRemoveTitle": "Remove SSH key?",
+  "@sshKeyRemoveTitle": {
+    "description": "Title of the confirm dialog when removing an SSH key."
+  },
+  "sshKeyRemoveMessage": "This key will no longer be able to log in to this server.",
+  "@sshKeyRemoveMessage": {
+    "description": "Body of the confirm dialog when removing an SSH key."
+  },
+  "discardChangesTitle": "Discard changes?",
+  "discardChangesBody": "Your edits to the advanced options have not been saved.",
+  "actionDiscard": "Discard",
+  "actionKeepEditing": "Keep editing",
+  "restoreDefaultsConfirmTitle": "Restore default options?",
+  "restoreDefaultsConfirmBody": "This replaces every advanced option with the recommended values.",
+  "restoreDefaultsDone": "Default options restored.",
+  "valueNotSet": "Not set",
+  "validationSubnet": "Enter an IPv4 network address ending in .0 (for example, 10.13.13.0).",
+  "validationMtu": "Enter an MTU between 576 and 1500.",
+  "validationDns": "Enter a comma-separated list of valid IP addresses.",
+  "validationInterfaceName": "Enter a valid interface name.",
+  "validationPublicEndpoint": "Enter a valid host or IP address.",
+  "actionSave": "Save",
+  "actionRestoreDefaults": "Restore defaults",
+  "actionAdvanced": "Advanced",
+  "actionConnectInstall": "Connect and install",
+  "sectionCreateUser": "Create a non-root user",
+  "sectionCreateUserHint": "You are logging in as root. A dedicated non-root user will be created for day-to-day access.",
+  "fieldNewUsername": "New username",
+  "fieldNewPassword": "New password",
+  "fieldConfirmPassword": "Confirm password",
+  "validationNewUsername": "Enter a valid username, different from root.",
+  "validationNewPassword": "At least 12 characters with 3 of: lowercase, uppercase, digit, symbol.",
+  "validationConfirmPassword": "The passwords do not match.",
+  "passwordStrengthWeak": "Weak",
+  "passwordStrengthFair": "Fair",
+  "passwordStrengthStrong": "Strong",
+  "advancedSectionWireguard": "WireGuard",
+  "advancedSectionWireguardHint": "These work for most servers. Change them only if your network needs specific values.",
+  "advancedSectionNetwork": "Network",
+  "advancedSectionNetworkHint": "Leave the public endpoint blank to use the address the app detects for your server.",
+  "advancedSectionOptions": "Setup steps",
+  "advancedSectionOptionsHint": "Optional steps applied during installation. Hardening changes how you sign in to the server.",
+  "navServers": "Servers",
+  "navSettings": "Settings",
+  "navHelp": "Help",
+  "serverSearchHint": "Search servers…",
+  "serverSearchEmpty": "No servers match your search.",
+  "settingsTitle": "Settings",
+  "settingsAboutSection": "About",
+  "settingsAboutBody": "FAV provisions a Debian or Ubuntu server into a WireGuard VPN endpoint over SSH.",
+  "settingsAppearanceSection": "Appearance",
+  "@settingsAppearanceSection": { "description": "Settings section header — theme." },
+  "settingsLanguageSection": "Language",
+  "@settingsLanguageSection": { "description": "Settings section header — locale." },
+  "settingsDiagnosticSection": "Diagnostic",
+  "@settingsDiagnosticSection": { "description": "Settings section header — diagnostic bundle." },
+  "settingsDangerZoneSection": "Danger zone",
+  "@settingsDangerZoneSection": { "description": "Settings section header — destructive actions." },
+  "settingsSecuritySection": "Security",
+  "@settingsSecuritySection": { "description": "Settings section header — app lock." },
+  "helpContentLoadError": "This page could not be loaded.",
+  "@helpContentLoadError": { "description": "Error view on a help page whose bundled markdown failed to load." },
+  "settingsAppLockTitle": "App lock",
+  "@settingsAppLockTitle": { "description": "Label of the app-lock switch." },
+  "settingsAppLockSubtitle": "Require the device unlock to open the app",
+  "@settingsAppLockSubtitle": { "description": "Subtitle of the app-lock switch when device auth is available." },
+  "settingsAppLockUnavailable": "Set up a screen lock on this device to use the app lock",
+  "@settingsAppLockUnavailable": { "description": "Subtitle of the disabled app-lock switch when the device has no unlock method." },
+  "appLockLockedTitle": "FAV is locked",
+  "@appLockLockedTitle": { "description": "Title on the lock screen." },
+  "appLockUnlockButton": "Unlock",
+  "@appLockUnlockButton": { "description": "Button on the lock screen that retries the system prompt." },
+  "appLockReason": "Unlock to access your servers",
+  "@appLockReason": { "description": "Reason shown inside the system authentication prompt." },
+  "settingsThemeSystem": "Follow system",
+  "@settingsThemeSystem": { "description": "Theme radio label — follow OS appearance." },
+  "settingsThemeLight": "Light",
+  "@settingsThemeLight": { "description": "Theme radio label — force light." },
+  "settingsThemeDark": "Dark",
+  "@settingsThemeDark": { "description": "Theme radio label — force dark." },
+  "settingsLocaleSystem": "Automatic",
+  "@settingsLocaleSystem": { "description": "Language picker label — follow OS language." },
+  "settingsVersionLabel": "Version",
+  "@settingsVersionLabel": { "description": "About section — label before version string." },
+  "settingsFullName": "FAV — Free and verifiable VPN provisioner",
+  "@settingsFullName": { "description": "About section — the project's full name shown under the app title." },
+  "settingsLicensesTile": "Open source licenses",
+  "@settingsLicensesTile": { "description": "About row — opens showLicensePage." },
+  "settingsPrivacyTile": "Privacy",
+  "@settingsPrivacyTile": { "description": "About row — opens privacy dialog." },
+  "settingsPrivacyDialogTitle": "Privacy",
+  "@settingsPrivacyDialogTitle": { "description": "Privacy AlertDialog title." },
+  "settingsPrivacyDialogBody": "This app collects no telemetry or usage data. All information — servers, peers, configurations — is stored only on your device, in an encrypted database. The \"Report a problem\" flow is the only one that sends data outside: the attached data is visible and editable before you send.",
+  "@settingsPrivacyDialogBody": { "description": "Privacy AlertDialog body paragraph." },
+  "settingsPrivacyDialogClose": "Close",
+  "@settingsPrivacyDialogClose": { "description": "Privacy AlertDialog dismiss button." },
+  "settingsSourceTile": "Source code (GitHub)",
+  "@settingsSourceTile": { "description": "About row — opens external GitHub repo." },
+  "settingsDiagnosticContentsHeader": "What's in the bundle",
+  "@settingsDiagnosticContentsHeader": { "description": "ExpansionTile header above the included/excluded lists." },
+  "settingsDiagnosticIncludedHeader": "Included",
+  "@settingsDiagnosticIncludedHeader": { "description": "Subheading inside the diagnostic expansion — included fields." },
+  "settingsDiagnosticIncludedList": "App version, platform, locale, theme. Server count, OS family, SSH port, install state, peer count, truncated host key fingerprint. Last 20 error codes with timestamp. Last 5 install outcomes. Whether custom installer scripts are present.",
+  "@settingsDiagnosticIncludedList": { "description": "Comma-separated list of fields the bundle contains." },
+  "settingsDiagnosticExcludedHeader": "Not included",
+  "@settingsDiagnosticExcludedHeader": { "description": "Subheading inside the diagnostic expansion — excluded fields." },
+  "settingsDiagnosticExcludedList": "Server IPs and hostnames, usernames, passwords, full key fingerprints, private keys, peer labels, peer addresses, .conf contents, installer log text.",
+  "@settingsDiagnosticExcludedList": { "description": "Comma-separated list of fields the bundle never contains." },
+  "settingsDiagnosticCopyButton": "Copy diagnostic to clipboard",
+  "@settingsDiagnosticCopyButton": { "description": "Primary button in the Diagnostic section." },
+  "settingsDiagnosticCopiedSnackbar": "Diagnostic copied to clipboard",
+  "@settingsDiagnosticCopiedSnackbar": { "description": "SnackBar confirming the copy." },
+  "settingsWipeButton": "Erase all local data",
+  "@settingsWipeButton": { "description": "Danger zone primary button." },
+  "settingsScriptsBody": "View and edit the scripts that run on your servers. Editing them changes what every install and operation executes.",
+  "@settingsScriptsBody": {
+    "description": "Danger zone explanation above the script-editor button."
+  },
+  "settingsScriptsButton": "Edit installer scripts",
+  "@settingsScriptsButton": {
+    "description": "Danger zone button that opens the installer-script editor."
+  },
+  "settingsWipeDialog1Title": "Erase all local data?",
+  "@settingsWipeDialog1Title": { "description": "Wipe confirmation dialog #1 title." },
+  "settingsWipeDialog1Body": "Servers, peers, scripts and all preferences will be removed. Your servers will keep running — this only erases data on this device.",
+  "@settingsWipeDialog1Body": { "description": "Wipe confirmation dialog #1 body." },
+  "settingsWipeDialog1Cancel": "Cancel",
+  "@settingsWipeDialog1Cancel": { "description": "Wipe dialog #1 cancel button." },
+  "settingsWipeDialog1Continue": "Continue",
+  "@settingsWipeDialog1Continue": { "description": "Wipe dialog #1 continue button." },
+  "settingsWipeDialog2Title": "Final confirmation",
+  "@settingsWipeDialog2Title": { "description": "Wipe confirmation dialog #2 title." },
+  "settingsWipeDialog2Body": "Type {word} to confirm. The app will close immediately.",
+  "@settingsWipeDialog2Body": {
+    "description": "Wipe dialog #2 body. {word} is the localized confirm word.",
+    "placeholders": { "word": { "type": "String" } }
+  },
+  "settingsWipeConfirmWord": "DELETE",
+  "@settingsWipeConfirmWord": { "description": "Confirmation word the user must type. EN: DELETE. IT: CANCELLA." },
+  "settingsWipeDialog2Cancel": "Cancel",
+  "@settingsWipeDialog2Cancel": { "description": "Wipe dialog #2 cancel button." },
+  "settingsWipeDialog2Action": "Erase everything",
+  "@settingsWipeDialog2Action": { "description": "Wipe dialog #2 confirm-and-execute button." },
+  "settingsWipeError": "Failed to erase data: {reason}",
+  "@settingsWipeError": {
+    "description": "SnackBar shown when wipe() throws. {reason} is a short message.",
+    "placeholders": { "reason": { "type": "String" } }
+  },
+  "settingsPostWipeTitle": "Data erased",
+  "@settingsPostWipeTitle": { "description": "iOS post-wipe screen title." },
+  "settingsPostWipeBody": "Close and re-open the app to continue.",
+  "@settingsPostWipeBody": { "description": "iOS post-wipe screen body." },
+  "bootFailureTitle": "The app could not start",
+  "@bootFailureTitle": { "description": "Boot-failure fallback app title (M10)." },
+  "bootFailureBody": "The local data could not be opened. This can happen when the app's data was restored from a backup made on another device, so it no longer matches this device's security key. You can erase the local data to start fresh — your servers keep running; only the data on this device is removed.",
+  "@bootFailureBody": { "description": "Boot-failure fallback app body: why the data could not open and what erasing does." },
+  "settingsWipeFailedTitle": "The data could not be erased",
+  "@settingsWipeFailedTitle": { "description": "Post-wipe failure view title (H3)." },
+  "settingsWipeFailedBody": "Some data may still be on this device. Try again; if the error persists, close and re-open the app and repeat the erase.",
+  "@settingsWipeFailedBody": { "description": "Post-wipe failure view body: some data may remain, retry guidance." },
+  "helpReportExtendedDiagCheckbox": "Include extended diagnostic (recommended)",
+  "@helpReportExtendedDiagCheckbox": { "description": "Report Issue opt-in checkbox label." },
+  "helpReportExtendedDiagSubtitle": "Adds about 1 KB to the report body.",
+  "helpReportAttachLogs": "Attach recent app logs",
+  "@helpReportAttachLogs": { "description": "Bug report checkbox: opt-in to attach the scrubbed app logs." },
+  "helpReportLogsPreviewTitle": "Review the logs",
+  "@helpReportLogsPreviewTitle": { "description": "Title of the editable log preview dialog." },
+  "helpReportLogsPreviewBody": "Server addresses and usernames are masked. Edit freely — only the text below is copied to the clipboard; paste it into the GitHub issue once it opens.",
+  "@helpReportLogsPreviewBody": { "description": "Body of the log preview dialog: masking note + paste instruction." },
+  "helpReportLogsCopyContinue": "Copy logs & continue",
+  "helpReportLogsContinueWithout": "Continue without logs",
+  "@helpReportLogsContinueWithout": { "description": "Log preview dialog: proceed with the report without attaching logs." },
+  "@helpReportLogsCopyContinue": { "description": "Confirming action of the log preview dialog." },
+  "@helpReportExtendedDiagSubtitle": { "description": "Report Issue opt-in checkbox subtitle." },
+  "helpReportExtendedDiagTruncated": "[diagnostic truncated — use Settings → Copy diagnostic for the full bundle]",
+  "@helpReportExtendedDiagTruncated": { "description": "Placeholder inserted when the bundle would push the URL past the GitHub cap." },
+  "helpTitle": "Help",
+  "helpIntro": "Quick guidance for provisioning a server.",
+  "helpAddServerTitle": "Adding a server",
+  "helpAddServerBody": "Enter the SSH host, port and credentials. The password is used only for this session and never stored.",
+  "helpInstallTitle": "Installation",
+  "helpInstallBody": "The installer runs on the server and survives connection loss. Reopen the app to resume an interrupted run.",
+  "helpSecurityTitle": "Security",
+  "helpSecurityBody": "Host keys are pinned on first use. Disabling root SSH access is protected by an anti-lockout check.",
+  "glossaryAllowedIpsTitle": "Allowed IPs",
+  "@glossaryAllowedIpsTitle": { "description": "Glossary title — Allowed IPs." },
+  "glossaryAllowedIpsBody": "The list of addresses that a peer is allowed to send traffic to through the VPN tunnel. For a typical client, this includes the VPN server's internal network and, often, the entire Internet (0.0.0.0/0). For a peer entry on the server side, it normally contains only the peer's own VPN address.",
+  "@glossaryAllowedIpsBody": { "description": "Glossary body — Allowed IPs." },
+  "glossaryDnsTitle": "DNS",
+  "@glossaryDnsTitle": { "description": "Glossary title — DNS." },
+  "glossaryDnsBody": "The system that turns names like example.com into IP addresses your device can connect to. WireGuard lets each peer use a custom DNS server, which is useful when you want all DNS queries to go through the VPN instead of your local network.",
+  "@glossaryDnsBody": { "description": "Glossary body — DNS." },
+  "glossaryFingerprintTitle": "Fingerprint",
+  "@glossaryFingerprintTitle": { "description": "Glossary title — fingerprint." },
+  "glossaryFingerprintBody": "A short summary of a server's identity key. The first time you connect, the app shows the fingerprint and locks it in. On every later connection, the app refuses to talk to the server if its fingerprint has changed — a change can indicate someone is impersonating it.",
+  "@glossaryFingerprintBody": { "description": "Glossary body — fingerprint." },
+  "glossaryFirewallTitle": "Firewall",
+  "@glossaryFirewallTitle": { "description": "Glossary title — firewall." },
+  "glossaryFirewallBody": "A set of rules that controls which network traffic is allowed in and out of a system. On a VPN server, the firewall is configured to allow incoming connections on the WireGuard port and to forward traffic between the VPN tunnel and the public Internet. Without the right firewall rules, clients cannot reach the server or browse the web through the VPN.",
+  "@glossaryFirewallBody": { "description": "Glossary body — firewall." },
+  "glossaryHandshakeTitle": "Handshake",
+  "@glossaryHandshakeTitle": { "description": "Glossary title — handshake." },
+  "glossaryHandshakeBody": "The brief exchange of cryptographic data that two WireGuard peers perform to agree on a shared session key. A successful handshake means both sides have verified each other's identity and are ready to encrypt traffic. The most recent handshake timestamp is a reliable indicator of whether a peer is currently reachable.",
+  "@glossaryHandshakeBody": { "description": "Glossary body — handshake." },
+  "glossaryMtuTitle": "MTU",
+  "@glossaryMtuTitle": { "description": "Glossary title — MTU." },
+  "glossaryMtuBody": "Maximum Transmission Unit — the largest packet size, in bytes, that a network link will carry in a single chunk. WireGuard adds a small amount of overhead to each packet, so the MTU of the VPN tunnel is usually set a little lower than your regular network's MTU. Setting it too high causes packets to be fragmented and slows down the connection; setting it too low wastes bandwidth.",
+  "@glossaryMtuBody": { "description": "Glossary body — MTU." },
+  "glossaryPeerTitle": "Peer",
+  "@glossaryPeerTitle": { "description": "Glossary title — peer." },
+  "glossaryPeerBody": "Any device that participates in a WireGuard VPN — both the server and each client are called peers. Every peer has a unique public key that identifies it, and a list of Allowed IPs that tells other peers what traffic to send its way. Adding a peer to the server creates a configuration entry for that device and generates a client profile it can import.",
+  "@glossaryPeerBody": { "description": "Glossary body — peer." },
+  "glossaryPublicPrivateKeyTitle": "Public and private keys",
+  "@glossaryPublicPrivateKeyTitle": { "description": "Glossary title — public and private keys." },
+  "glossaryPublicPrivateKeyBody": "WireGuard uses a pair of mathematically linked keys for each peer. The private key is a secret kept only on the peer's own device and is never shared with anyone. The public key is derived from the private key and can be shared freely — it tells other peers how to encrypt data so that only the holder of the matching private key can read it. This app generates and stores the key pair for you automatically.",
+  "@glossaryPublicPrivateKeyBody": { "description": "Glossary body — public and private keys." },
+  "glossaryHardeningTitle": "SSH hardening",
+  "glossaryHardeningBody": "Optional steps that make a server harder to break into: blocking repeated failed logins (fail2ban) and turning off password sign-in in favour of keys. Because turning off passwords changes how you log in, getting it wrong can lock you out. This app applies it only after it has created and tested your new key-based login, backed up the existing SSH configuration, and run a dry-run check, and it rolls everything back automatically if a step fails.",
+  "glossarySshTitle": "SSH",
+  "@glossarySshTitle": { "description": "Glossary title — SSH." },
+  "glossarySshBody": "Secure Shell — an encrypted protocol used to log in to and run commands on a remote server over any network. This app uses SSH to reach your server, run the WireGuard installer, and retrieve peer status. Your SSH credentials are used only for the duration of each operation and are never stored on the device.",
+  "@glossarySshBody": { "description": "Glossary body — SSH." },
+  "glossarySubnetTitle": "Subnet",
+  "@glossarySubnetTitle": { "description": "Glossary title — subnet." },
+  "glossarySubnetBody": "A range of IP addresses that belong to the same logical network, written in CIDR notation (for example, 10.0.0.0/24). Inside a WireGuard VPN, the subnet defines the pool of addresses available to the server and its peers. A /24 subnet provides up to 254 usable addresses, which is enough for most personal or small-team deployments.",
+  "@glossarySubnetBody": { "description": "Glossary body — subnet." },
+  "glossarySudoTitle": "Sudo",
+  "@glossarySudoTitle": { "description": "Glossary title — sudo." },
+  "glossarySudoBody": "A command on Linux systems that lets a regular user run specific commands with administrator (root) privileges. The WireGuard installer needs sudo to install packages, configure network interfaces and modify system files. The account you use to connect must have sudo access; otherwise the installation cannot proceed.",
+  "@glossarySudoBody": { "description": "Glossary body — sudo." },
+  "glossaryUdpPortTitle": "UDP port",
+  "@glossaryUdpPortTitle": { "description": "Glossary title — UDP port." },
+  "glossaryUdpPortBody": "The numbered \"door\" on the server through which WireGuard listens for incoming connections. WireGuard uses the UDP protocol rather than TCP, so this port must be open in the server's firewall for UDP traffic. The default port is 51820, but you can change it to any unused port number if needed.",
+  "@glossaryUdpPortBody": { "description": "Glossary body — UDP port." },
+  "glossaryVpnTitle": "VPN",
+  "@glossaryVpnTitle": { "description": "Glossary title — VPN." },
+  "glossaryVpnBody": "Virtual Private Network — a technology that creates an encrypted tunnel between your device and a server, making it appear as though your device is on the same local network as that server. All traffic sent through the tunnel is hidden from anyone on the path between you and the server. WireGuard is one of the simplest and fastest ways to set up a VPN.",
+  "@glossaryVpnBody": { "description": "Glossary body — VPN." },
+  "glossaryWireguardTitle": "WireGuard",
+  "@glossaryWireguardTitle": { "description": "Glossary title — WireGuard." },
+  "glossaryWireguardBody": "A modern, open-source VPN protocol built directly into the Linux kernel. Compared to older VPN solutions, WireGuard has a much smaller codebase, is easier to audit for security, and typically offers faster connection speeds and lower battery use on mobile devices. This app sets up WireGuard on your server automatically so you do not need to configure it by hand.",
+  "@glossaryWireguardBody": { "description": "Glossary body — WireGuard." },
+  "actionImport": "Import",
+  "actionExport": "Export",
+  "actionImportAnyway": "Import anyway",
+  "scriptImportSuspiciousTitle": "Suspicious patterns detected",
+  "scriptImportSuspiciousBody": "The imported script contains patterns that fetch and run code from the network without verification. Review the lines below before importing.",
+  "scriptImportLine": "Line {line}",
+  "@scriptImportLine": {
+    "description": "Label preceding a suspicious line excerpt in the warning dialog.",
+    "placeholders": {"line": {"type": "int"}}
+  },
+  "scriptImportSuccess": "Script imported.",
+  "scriptImportEmpty": "The selected file is empty.",
+  "scriptImportFailed": "Could not read the script file.",
+  "scriptExportSuccess": "Script exported.",
+  "scriptExportFailed": "Could not export the script.",
+  "profileTitle": "Client profile",
+  "monitorBannerConnected": "Connected",
+  "@monitorBannerConnected": {
+    "description": "Live status banner: peer is currently online (M15-T6)."
+  },
+  "monitorBannerLastSeenPrefix": "Last seen ",
+  "@monitorBannerLastSeenPrefix": {
+    "description": "Live status banner prefix combined with the existing lastSeen* time-ago strings."
+  },
+  "monitorBannerNeverConnected": "Never connected",
+  "@monitorBannerNeverConnected": {
+    "description": "Live status banner: peer is known but never observed online."
+  },
+  "monitorBannerAgentStale": "Monitoring agent not reporting",
+  "@monitorBannerAgentStale": {
+    "description": "Live status banner: monitor snapshot older than 90s."
+  },
+  "monitorBannerSshDown": "Cannot reach the server",
+  "@monitorBannerSshDown": {
+    "description": "Live status banner: SSH polling failed."
+  },
+  "monitorBannerNotInstalled": "Monitoring not installed on this server",
+  "@monitorBannerNotInstalled": {
+    "description": "Live status banner: snapshot file missing on the server."
+  },
+  "statusWireguardInstalled": "WireGuard installed",
+  "@statusWireguardInstalled": {
+    "description": "Static badge in the detail header when monitoring is unavailable but WireGuard is installed."
+  },
+  "statusPeersConnected": "{count, plural, =0{No clients connected} =1{1 client connected} other{{count} clients connected}}",
+  "@statusPeersConnected": {
+    "description": "Live count of currently-online peers, shown as a badge in the detail header.",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "historyTitle": "Connection history",
+  "@historyTitle": {
+    "description": "AppBar title of the per-server connection history screen."
+  },
+  "historyOpenTooltip": "Open connection history",
+  "@historyOpenTooltip": {
+    "description": "Tooltip of the AppBar action that opens the history screen."
+  },
+  "shellOpenTooltip": "Open SSH terminal",
+  "@shellOpenTooltip": {
+    "description": "Tooltip of the AppBar action that opens the SSH shell."
+  },
+  "shellTitle": "Terminal",
+  "@shellTitle": {
+    "description": "AppBar title of the interactive SSH shell screen."
+  },
+  "shellConnecting": "Connecting…",
+  "@shellConnecting": {
+    "description": "Status shown while the SSH shell connection is opening."
+  },
+  "shellDisconnected": "Disconnected",
+  "@shellDisconnected": {
+    "description": "Status shown when the SSH shell session has ended."
+  },
+  "shellError": "Connection failed",
+  "@shellError": {
+    "description": "Title shown when the SSH shell connection could not be established."
+  },
+  "shellDisconnect": "Disconnect",
+  "@shellDisconnect": {
+    "description": "Tooltip of the AppBar action that closes the SSH shell."
+  },
+  "shellKeyEsc": "ESC",
+  "@shellKeyEsc": {
+    "description": "Key cap of the Escape key on the shell extra-keys bar; a universal terminal key name, normally left untranslated."
+  },
+  "shellKeyTab": "TAB",
+  "@shellKeyTab": {
+    "description": "Key cap of the Tab key on the shell extra-keys bar; a universal terminal key name, normally left untranslated."
+  },
+  "shellKeyCtrl": "CTRL",
+  "@shellKeyCtrl": {
+    "description": "Key cap of the sticky Control modifier on the shell extra-keys bar; a universal terminal key name, normally left untranslated."
+  },
+  "shellKeyAlt": "ALT",
+  "@shellKeyAlt": {
+    "description": "Key cap of the sticky Alt modifier on the shell extra-keys bar; a universal terminal key name, normally left untranslated."
+  },
+  "shellKeyHome": "HOME",
+  "@shellKeyHome": {
+    "description": "Key cap of the Home key on the shell extra-keys bar; a universal terminal key name, normally left untranslated."
+  },
+  "shellKeyEnd": "END",
+  "@shellKeyEnd": {
+    "description": "Key cap of the End key on the shell extra-keys bar; a universal terminal key name, normally left untranslated."
+  },
+  "shellKeyPgUp": "PGUP",
+  "@shellKeyPgUp": {
+    "description": "Key cap of the Page Up key on the shell extra-keys bar; a universal terminal key name, normally left untranslated."
+  },
+  "shellKeyPgDn": "PGDN",
+  "@shellKeyPgDn": {
+    "description": "Key cap of the Page Down key on the shell extra-keys bar; a universal terminal key name, normally left untranslated."
+  },
+  "shellKeyUp": "Arrow up",
+  "@shellKeyUp": {
+    "description": "Screen-reader label of the arrow-up key on the shell extra-keys bar."
+  },
+  "shellKeyDown": "Arrow down",
+  "@shellKeyDown": {
+    "description": "Screen-reader label of the arrow-down key on the shell extra-keys bar."
+  },
+  "shellKeyLeft": "Arrow left",
+  "@shellKeyLeft": {
+    "description": "Screen-reader label of the arrow-left key on the shell extra-keys bar."
+  },
+  "shellKeyRight": "Arrow right",
+  "@shellKeyRight": {
+    "description": "Screen-reader label of the arrow-right key on the shell extra-keys bar."
+  },
+  "shellKeyCopy": "Copy",
+  "@shellKeyCopy": {
+    "description": "Screen-reader label of the copy key on the shell extra-keys bar (copies the terminal selection)."
+  },
+  "shellKeyPaste": "Paste",
+  "@shellKeyPaste": {
+    "description": "Screen-reader label of the paste key on the shell extra-keys bar (pastes the clipboard into the terminal)."
+  },
+  "shellRetry": "Retry",
+  "@shellRetry": {
+    "description": "Button that retries opening the SSH shell after a failure or disconnect."
+  },
+  "historyRange24h": "Last 24 h",
+  "historyRange7d": "Last 7 days",
+  "historyChartEmpty": "No connections yet in this window.",
+  "historyLogEmpty": "No events match the current filters.",
+  "historyLogShowOlder": "{count, plural, one{Show 1 older event} other{Show {count} older events}}",
+  "@historyLogShowOlder": {
+    "description": "Reveals the events beyond the initially-rendered cap in the log.",
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "historyLegendBytes": "RX = received, TX = sent",
+  "historyEmptyTitle": "No activity yet",
+  "historyEmptyBody": "Connections will appear here once your clients start using the VPN.",
+  "historyMonitorMissingTitle": "Monitoring isn't set up",
+  "historyMonitorMissingBody": "This server has no monitoring agent, so connection history can't be collected. Turn on monitoring the next time you install or update the server.",
+  "historySectionChart": "Sessions",
+  "historySectionLog": "Event log",
+  "historyFilterEventTypeLabel": "Event type",
+  "historyFilterConnect": "Connect",
+  "historyFilterDisconnect": "Disconnect",
+  "historyFilterPeerLabel": "Client",
+  "historyFilterPeerAll": "All clients",
+  "historyEventConnect": "Connected",
+  "historyEventDisconnect": "Disconnected",
+  "historySessionInProgress": "In progress",
+  "historyBytesPair": "RX {rx} · TX {tx}",
+  "@historyBytesPair": {
+    "description": "Cumulative RX/TX bytes shown next to an event in the log.",
+    "placeholders": {
+      "rx": {"type": "String"},
+      "tx": {"type": "String"}
+    }
+  },
+  "historySessionStartLabel": "Started",
+  "historySessionEndLabel": "Ended",
+  "historySessionDurationLabel": "Duration",
+  "historyEventTimeLabel": "Time",
+  "historySessionSemantic": "{peer}, connected {start} to {end}, {duration}",
+  "@historySessionSemantic": {
+    "description": "Screen-reader label for a session bar in the timeline chart.",
+    "placeholders": {
+      "peer": {"type": "String"},
+      "start": {"type": "String"},
+      "end": {"type": "String"},
+      "duration": {"type": "String"}
+    }
+  },
+  "historyDurationHm": "{hours}h {minutes}m",
+  "@historyDurationHm": {
+    "description": "Human duration in hours and minutes for sessions ≥ 1 hour.",
+    "placeholders": {
+      "hours": {"type": "int"},
+      "minutes": {"type": "int"}
+    }
+  },
+  "historyDurationMs": "{minutes}m {seconds}s",
+  "@historyDurationMs": {
+    "description": "Human duration in minutes and seconds for sessions < 1 hour.",
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "seconds": {"type": "int"}
+    }
+  },
+  "profileScanToImport": "Scan with the WireGuard app to import the tunnel.",
+  "profileSectionDetails": "Profile details",
+  "profileEndpoint": "Endpoint",
+  "profileAddress": "Address",
+  "profileDns": "DNS",
+  "profileAllowedIps": "Routes",
+  "profileMtu": "MTU",
+  "profileKeepalive": "Keepalive",
+  "profileKeepaliveSeconds": "{seconds}s",
+  "@profileKeepaliveSeconds": {
+    "description": "Persistent keepalive interval rendered with a seconds suffix.",
+    "placeholders": {"seconds": {"type": "int"}}
+  },
+  "profileConfHeading": "Configuration (.conf)",
+  "profileShowConf": "Show .conf",
+  "profileHideConf": "Hide .conf",
+  "profileViewProfileAction": "View client profile",
+  "profileNoneSavedTitle": "No client profile saved",
+  "profileNoneSavedBody": "The first client profile is saved at the end of an installation. Reinstall or contact the administrator to recover it.",
+  "profileCopied": "Profile copied to clipboard — contains the client private key.",
+  "profileLoadFailed": "Could not load the saved profile.",
+  "profileShareSubject": "WireGuard client profile",
+  "actionCopy": "Copy",
+  "actionShare": "Share",
+  "actionShowImportInstructions": "How to import in WireGuard",
+  "@actionShowImportInstructions": {
+    "description": "Primary button on the client profile screen — opens the step-by-step import instructions page."
+  },
+  "instructionsTitle": "Import your profile",
+  "@instructionsTitle": {
+    "description": "AppBar title of the import-instructions screen."
+  },
+  "instructionsTabThisPhoneIos": "On this iPhone",
+  "@instructionsTabThisPhoneIos": {
+    "description": "Label of the first tab when the user's device is iOS."
+  },
+  "instructionsTabThisPhoneAndroid": "On this Android",
+  "@instructionsTabThisPhoneAndroid": {
+    "description": "Label of the first tab when the user's device is Android."
+  },
+  "instructionsTabOtherPhone": "On another phone",
+  "@instructionsTabOtherPhone": {
+    "description": "Label of the second tab — instructions for importing the profile on another phone via QR code."
+  },
+  "instructionsScreenshotPlaceholder": "Screenshot coming soon",
+  "@instructionsScreenshotPlaceholder": {
+    "description": "Label rendered inside the screenshot placeholder box of each instruction step."
+  },
+  "instructionsInstallStoreAppStore": "Get WireGuard on the App Store",
+  "@instructionsInstallStoreAppStore": {
+    "description": "Button label on the install step that opens the official WireGuard app on the Apple App Store."
+  },
+  "instructionsInstallStorePlayStore": "Get WireGuard on Google Play",
+  "@instructionsInstallStorePlayStore": {
+    "description": "Button label on the install step that opens the official WireGuard app on Google Play."
+  },
+  "instructionsAndroidStep1Title": "Install the WireGuard app",
+  "instructionsAndroidStep1Body": "Open Google Play, search for WireGuard, then install it. You only need to do this the first time.",
+  "instructionsAndroidStep2Title": "Choose based on the device",
+  "instructionsAndroidStep2Body": "• Configuring this device: return to the profile in FAV, tap Save and use the file.\n• Configuring another phone or tablet: leave the QR code visible on this device and scan it from the other one.",
+  "instructionsAndroidStep3Title": "Open the WireGuard app",
+  "instructionsAndroidStep3Body": "Find the WireGuard icon on your phone and open the app.",
+  "instructionsAndroidStep4Title": "Choose the same method in WireGuard",
+  "instructionsAndroidStep4Body": "Tap the blue + button, then:\n• File: choose Import from file or archive.\n• QR: choose Scan from QR code.",
+  "instructionsAndroidStep5Title": "Complete the import",
+  "instructionsAndroidStep5Body": "On the device being configured, select the .conf file or scan the QR code visible on the device running FAV. Do not rename the file: WireGuard uses its name as the tunnel name and accepts only a strict format; FAV's name is already compatible.",
+  "instructionsAndroidStep6Title": "Turn on the VPN",
+  "instructionsAndroidStep6Body": "Tap the switch next to the profile name to turn the VPN on or off whenever you want.",
+  "instructionsIosStep1Title": "Install the WireGuard app",
+  "instructionsIosStep1Body": "Open the App Store, search for WireGuard, then install it. You only need to do this the first time.",
+  "instructionsIosStep2Title": "Choose based on the device",
+  "instructionsIosStep2Body": "• Configuring this iPhone or iPad: return to the profile in FAV, tap Save and use the file.\n• Configuring another iPhone or iPad: leave the QR code visible on the device running FAV and scan it from the other one.",
+  "instructionsIosStep3Title": "Open WireGuard",
+  "instructionsIosStep3Body": "Open WireGuard and tap + or Add a tunnel, then:\n• File: choose Create from file or archive.\n• QR: choose Create from QR code.",
+  "instructionsIosStep4Title": "Import the profile",
+  "instructionsIosStep4Body": "On the device being configured, select the .conf file or scan the QR code visible on the device running FAV. Do not rename the file: WireGuard uses its name as the tunnel name and accepts only a strict format; FAV's name is already compatible.",
+  "instructionsIosStep5Title": "Turn on the VPN",
+  "instructionsIosStep5Body": "Tap the switch next to the profile name to turn the VPN on or off whenever you want.",
+  "instructionsQrStep1Title": "Install WireGuard on the other phone",
+  "instructionsQrStep1Body": "On the other phone install WireGuard from Google Play (Android) or from the App Store (iPhone).",
+  "instructionsQrStep2Title": "Open the WireGuard app",
+  "instructionsQrStep2Body": "Open the WireGuard app on the other phone.",
+  "instructionsQrStep3Title": "Choose Scan from QR code",
+  "instructionsQrStep3Body": "Tap the + button and choose Scan from QR code. Allow camera access if you are asked.",
+  "instructionsQrStep4Title": "Point the camera",
+  "instructionsQrStep4Body": "Point the camera at the QR code shown on this app's profile screen. Hold the phone steady until the code is read.",
+  "instructionsQrStep5Title": "Name and save",
+  "instructionsQrStep5Body": "Give the profile a name (if asked) and tap Save.",
+  "instructionsQrStep6Title": "Turn on the VPN",
+  "instructionsQrStep6Body": "Tap the switch next to the profile name to activate the VPN on the other phone.",
+  "helpHubQuickStartTitle": "Your first server",
+  "@helpHubQuickStartTitle": { "description": "Featured card title on the Help hub." },
+  "helpHubQuickStartBody": "A step-by-step walkthrough — from buying a virtual machine to connecting your first peer.",
+  "@helpHubQuickStartBody": { "description": "Featured card body on the Help hub." },
+  "helpHubQuickStartCta": "Start",
+  "@helpHubQuickStartCta": { "description": "Featured card CTA on the Help hub." },
+  "helpHubGlossary": "Glossary",
+  "@helpHubGlossary": { "description": "Hub row title." },
+  "helpHubGlossarySubtitle": "Plain-language definitions of key terms",
+  "@helpHubGlossarySubtitle": { "description": "Hub row subtitle." },
+  "helpHubErrors": "Error codes",
+  "@helpHubErrors": { "description": "Hub row title." },
+  "helpHubErrorsSubtitle": "What each ERR-xx means and how to fix it",
+  "@helpHubErrorsSubtitle": { "description": "Hub row subtitle." },
+  "helpHubFirewall": "Firewall and port opening",
+  "@helpHubFirewall": { "description": "Hub row title." },
+  "helpHubFirewallSubtitle": "Allow incoming WireGuard traffic to your server",
+  "@helpHubFirewallSubtitle": { "description": "Hub row subtitle." },
+  "helpHubFaq": "FAQ",
+  "@helpHubFaq": { "description": "Hub row title." },
+  "helpHubFaqSubtitle": "Common questions answered in plain words",
+  "@helpHubFaqSubtitle": { "description": "Hub row subtitle." },
+  "helpHubResources": "Resources",
+  "@helpHubResources": { "description": "Hub row title." },
+  "helpHubResourcesSubtitle": "Curated links to dig deeper",
+  "@helpHubResourcesSubtitle": { "description": "Hub row subtitle." },
+  "helpHubReportIssue": "Report a problem",
+  "@helpHubReportIssue": { "description": "Hub row title." },
+  "helpHubReportIssueSubtitle": "Open a prefilled issue on GitHub",
+  "@helpHubReportIssueSubtitle": { "description": "Hub row subtitle." },
+  "helpHubDonate": "Would you like to buy me a coffee?",
+  "@helpHubDonate": { "description": "Hub row title." },
+  "helpHubDonateSubtitle": "A small gesture that helps keep FAV going",
+  "@helpHubDonateSubtitle": { "description": "Hub row subtitle." },
+  "helpExternalLinkConfirmTitle": "Open external website?",
+  "@helpExternalLinkConfirmTitle": { "description": "Confirmation dialog title before opening an HTTPS link from Help." },
+  "helpExternalLinkConfirmBody": "You are about to leave the app and open this URL in your browser:",
+  "@helpExternalLinkConfirmBody": { "description": "Confirmation dialog body." },
+  "helpExternalLinkConfirmContinue": "Open",
+  "@helpExternalLinkConfirmContinue": { "description": "Confirmation dialog confirm button." },
+  "helpExternalLinkConfirmCancel": "Cancel",
+  "@helpExternalLinkConfirmCancel": { "description": "Confirmation dialog cancel button." },
+  "helpTranslationMissingBanner": "Translation not yet available — showing the English version.",
+  "@helpTranslationMissingBanner": { "description": "Banner shown when a Help markdown file is missing the locale variant." },
+  "helpGettingStartedTitle": "Your first server",
+  "@helpGettingStartedTitle": { "description": "AppBar title of the Quick Start walkthrough screen." },
+  "helpGlossaryTitle": "Glossary",
+  "@helpGlossaryTitle": { "description": "AppBar title of the glossary screen." },
+  "helpTroubleshootingTitle": "Error codes",
+  "@helpTroubleshootingTitle": { "description": "AppBar title for the troubleshooting list and detail screens." },
+  "helpTroubleshootingWhatHappened": "What happened",
+  "@helpTroubleshootingWhatHappened": { "description": "Section heading on the troubleshooting detail screen." },
+  "helpTroubleshootingWhyHappens": "Why this happens",
+  "@helpTroubleshootingWhyHappens": { "description": "Section heading on the troubleshooting detail screen." },
+  "helpTroubleshootingHowToFix": "How to fix it",
+  "@helpTroubleshootingHowToFix": { "description": "Section heading on the troubleshooting detail screen." },
+  "helpFirewallTitle": "Firewall and port opening",
+  "@helpFirewallTitle": { "description": "AppBar title of the firewall guide screen." },
+  "helpFaqTitle": "FAQ",
+  "@helpFaqTitle": { "description": "AppBar title of the FAQ screen." },
+  "helpResourcesTitle": "Resources",
+  "@helpResourcesTitle": { "description": "AppBar title of the resources screen." },
+  "helpDonateTitle": "Buy me a coffee",
+  "@helpDonateTitle": { "description": "AppBar title of the donate screen." },
+  "helpReportTitle": "Report a problem",
+  "@helpReportTitle": { "description": "AppBar title for the report-a-problem screen." },
+  "helpReportIntro": "Help us fix the issue. The information below will be attached automatically.",
+  "@helpReportIntro": { "description": "Intro paragraph on the report screen." },
+  "helpReportWhatDoing": "What were you doing?",
+  "@helpReportWhatDoing": { "description": "First text field label." },
+  "helpReportWhatDoingHint": "e.g. I was adding a new peer",
+  "@helpReportWhatDoingHint": { "description": "Placeholder for first text field." },
+  "helpReportWhatExpected": "What did you expect?",
+  "@helpReportWhatExpected": { "description": "Second text field label." },
+  "helpReportWhatExpectedHint": "e.g. that a QR code would appear",
+  "@helpReportWhatExpectedHint": { "description": "Placeholder for second text field." },
+  "helpReportWhatHappened": "What happened instead?",
+  "@helpReportWhatHappened": { "description": "Third text field label." },
+  "helpReportWhatHappenedHint": "e.g. a red error appeared and the app froze",
+  "@helpReportWhatHappenedHint": { "description": "Placeholder for third text field." },
+  "helpReportErrorCode": "Error code (optional)",
+  "@helpReportErrorCode": { "description": "Dropdown label for selecting an ERR-xx code." },
+  "helpReportErrorCodeNone": "Not selected",
+  "@helpReportErrorCodeNone": { "description": "Null option in the error-code dropdown." },
+  "helpReportSecurityWarning": "Never share QR codes or .conf files: they contain the keys of your VPN.",
+  "@helpReportSecurityWarning": { "description": "Security advisory shown above the submit button." },
+  "helpReportTechnicalDataHeader": "Technical data attached",
+  "@helpReportTechnicalDataHeader": { "description": "ExpansionTile header revealing the diagnostic payload." },
+  "helpReportOpenGithub": "Open GitHub to send",
+  "@helpReportOpenGithub": { "description": "Primary submit button." },
+  "helpReportCancel": "Cancel",
+  "@helpReportCancel": { "description": "Secondary action on the report screen." },
+  "helpReportFallbackTitle": "Send the report manually",
+  "@helpReportFallbackTitle": { "description": "Title of the clipboard-fallback dialog when the browser cannot be opened." },
+  "helpReportFallbackInstructions": "Tap Open link to open the issue page in your browser, then paste the text below into the issue body.",
+  "@helpReportFallbackInstructions": { "description": "Instructions paragraph in the fallback dialog." },
+  "helpReportFallbackOpenLink": "Open link",
+  "@helpReportFallbackOpenLink": { "description": "Button in the fallback dialog that retries opening the GitHub URL in the browser." },
+  "helpReportFallbackOpenFailed": "Could not open the browser. Copy the text and open the link manually.",
+  "@helpReportFallbackOpenFailed": { "description": "Inline error shown inside the fallback dialog when launchUrl fails." },
+  "helpReportFallbackBodyLabel": "Issue text",
+  "@helpReportFallbackBodyLabel": { "description": "Label above the selectable issue body text in the fallback dialog." },
+  "helpReportFallbackClose": "Close",
+  "@helpReportFallbackClose": { "description": "Close button in the fallback dialog." },
+  "helpReportFallbackCopy": "Copy to clipboard",
+  "@helpReportFallbackCopy": { "description": "Button on the fallback dialog." },
+  "helpMoreInfoButton": "More info",
+  "@helpMoreInfoButton": { "description": "Inline button under an error block linking to its troubleshooting card." },
+  "helpSnackBarAction": "Help",
+  "@helpSnackBarAction": { "description": "Action label on an error SnackBar linking to its troubleshooting card." },
+  "helpReportDiagAppLine": "App: {version}",
+  "@helpReportDiagAppLine": {
+    "description": "Diagnostic line — app version.",
+    "placeholders": { "version": { "type": "String" } }
+  },
+  "helpReportDiagPlatformLine": "Platform: {platform} {version}",
+  "@helpReportDiagPlatformLine": {
+    "description": "Diagnostic line — platform name + OS version.",
+    "placeholders": {
+      "platform": { "type": "String" },
+      "version": { "type": "String" }
+    }
+  },
+  "helpReportDiagLocaleLine": "Locale: {locale}",
+  "@helpReportDiagLocaleLine": {
+    "description": "Diagnostic line — current locale.",
+    "placeholders": { "locale": { "type": "String" } }
+  },
+  "helpReportDiagRecentLine": "Recent: {codes}",
+  "@helpReportDiagRecentLine": {
+    "description": "Diagnostic line — recent ERR-xx codes joined by comma.",
+    "placeholders": { "codes": { "type": "String" } }
+  },
+  "profileSaved": "Profile saved.",
+  "profileExportFailed": "Could not export the profile. Try again.",
+  "ipv6StatusRoutedTitle": "IPv6 routed through the VPN",
+  "ipv6StatusRoutedBody": "FAV verified native IPv6 routing on the server for this profile.",
+  "ipv6StatusBlockedTitle": "IPv6 blocked inside the VPN",
+  "ipv6StatusBlockedBody": "The server has no verified IPv6 route. This profile captures IPv6 and the server rejects it instead of allowing a direct fallback.",
+  "ipv6StatusUnavailableTitle": "IPv6 status unavailable",
+  "ipv6StatusUnavailableBody": "FAV cannot verify IPv6 protection for this saved profile. Do not treat it as a protected v2 export.",
+  "ipv6EvidenceServerVerified": "Server configuration verified by FAV",
+  "ipv6EvidenceServerUnavailable": "Server verification unavailable",
+  "ipv6EvidenceProfileReady": "Profile validated in FAV; not exported in this session",
+  "ipv6EvidenceProfileExported": "Profile exported from FAV in this session",
+  "ipv6EvidenceImportUnknown": "Import on the destination client not verified",
+  "ipv6EvidenceImportDeclared": "Import declared by the user; not technically verified by FAV",
+  "ipv6ClientWarningTitle": "Client protection is not verified",
+  "ipv6ClientWarningBody": "A profile and a handshake do not prove the destination device is protected when the VPN stops. Follow the instructions for that client and configure any required OS-level protection.",
+  "instructionsClientPlatformLabel": "Destination client platform",
+  "instructionsClientPlatformHint": "Choose the device that will import the profile, not necessarily this device.",
+  "instructionsDeclareImported": "I imported this profile",
+  "instructionsAndroidProtectionTitle": "Optional: configure Android VPN blocking",
+  "instructionsAndroidProtectionBody": "In Android VPN settings, select WireGuard, enable Always-on VPN, then enable Block connections without VPN. Availability and behaviour must still be checked on this Android version.",
+  "instructionsDesktopStep1Title": "Install WireGuard on {platform}",
+  "@instructionsDesktopStep1Title": {"placeholders": {"platform": {"type": "String"}}},
+  "instructionsDesktopStep1Body": "Install the official WireGuard client for the destination device.",
+  "instructionsDesktopStep2Title": "Import the saved profile",
+  "instructionsDesktopStep2Body": "Save or share the .conf from FAV, then import that file in WireGuard and activate the tunnel.",
+  "instructionsExternalMeasureTitle": "Check protection outside the profile",
+  "instructionsExternalMeasureBody": "FAV has not verified a portable kill switch for {platform}. If protection while the tunnel is stopped is required, configure and validate the client or OS firewall separately.",
+  "@instructionsExternalMeasureBody": {"placeholders": {"platform": {"type": "String"}}},
+  "actionContinue": "Continue",
+  "settingsAppLockTimeoutTitle": "Lock again",
+  "settingsAppLockTimeoutSubtitle": "Choose how long FAV waits after the app loses focus.",
+  "settingsAppLockTimeout1m": "After 1 minute",
+  "settingsAppLockTimeout2m": "After 2 minutes",
+  "settingsAppLockTimeout5m": "After 5 minutes",
+  "settingsAppLockTimeoutLaunch": "Only when FAV starts",
+  "backupSection": "Backup",
+  "backupTitle": "Backup and restore",
+  "backupSettingsSubtitle": "Create an encrypted recovery file or restore one on a new device",
+  "backupCreateSection": "Create backup",
+  "backupCreateBody": "Save an encrypted copy of your servers, pinned fingerprints, FAV SSH keys, peer profiles, custom scripts and transferable settings. SSH passwords, app lock, diagnostics and monitoring history are not included.",
+  "backupMultiDeviceWarning": "Avoid using the same backup on multiple active devices. Some information is stored locally, so changes made on one device may not appear on the others and can leave server or peer records inconsistent.",
+  "backupCreateAction": "Create encrypted backup",
+  "backupRestoreSection": "Restore backup",
+  "backupRestoreBody": "Restore a .favbackup file into an empty FAV installation. Existing local data is never merged or replaced.",
+  "backupInternetWarning": "An Internet connection is required to verify restored servers and to rotate SSH keys or revoke peers. Interrupted checks can be retried later.",
+  "backupEmptyAppRequired": "Restore is available only when FAV contains no servers, peers, installation history or custom scripts.",
+  "backupRestoreAction": "Restore backup",
+  "backupResumeAction": "Resume verification",
+  "backupResumeBody": "Some restored servers still need an online connection check or selected recovery action.",
+  "backupPendingServersTitle": "Waiting for verification",
+  "backupCreating": "Encrypting backup…",
+  "backupCreated": "Encrypted backup saved.",
+  "backupCreateFailed": "The backup could not be created or saved.",
+  "backupReading": "Checking backup…",
+  "backupRestoring": "Restoring local data…",
+  "backupRestoreFailed": "The backup could not be restored. Check the password and file, then try again.",
+  "backupSaveDialogTitle": "Save encrypted FAV backup",
+  "backupChooseDialogTitle": "Choose a FAV backup",
+  "backupPasswordCreateTitle": "Protect this backup",
+  "backupPasswordTitle": "Unlock backup",
+  "backupPasswordBody": "Enter the backup password. FAV cannot recover it if it is forgotten.",
+  "backupPasswordUnlockBody": "Enter the password used when this backup was created.",
+  "backupPasswordConfirm": "Confirm password",
+  "backupPasswordTooShort": "Use at least 12 characters.",
+  "backupPasswordMismatch": "The passwords do not match.",
+  "backupRestoreConfirmTitle": "Review restore options",
+  "backupRestoreSummary": "This backup contains {servers} servers and {peers} peer profiles.",
+  "@backupRestoreSummary": {"placeholders": {"servers": {"type": "int"}, "peers": {"type": "int"}}},
+  "backupRotateKeysTitle": "Previous device lost, stolen or compromised?",
+  "backupRotateKeysBody": "Generate a new FAV SSH key on every reachable hardened server, verify it, then remove the restored key. Create a new backup afterwards.",
+  "backupRevokePeersTitle": "Revoke all existing peers",
+  "backupRevokePeersBody": "Permanently disconnect and delete every existing WireGuard peer from each reachable server. This cannot be undone.",
+  "backupRevokeConfirmTitle": "Revoke every existing peer?",
+  "backupRevokeConfirmBody": "Every WireGuard profile on each reachable server will stop working. This includes peers created after this backup and profiles used by devices that are not compromised.",
+  "backupRevokeFinalTitle": "Final confirmation",
+  "backupRevokeFinalBody": "Type {word} to enable peer revocation.",
+  "@backupRevokeFinalBody": {"placeholders": {"word": {"type": "String"}}},
+  "backupRevokeWord": "REVOKE",
+  "backupRevokeAction": "Revoke peers",
+  "backupVerifyingServer": "Checking {label} ({current} of {total})…",
+  "@backupVerifyingServer": {"placeholders": {"label": {"type": "String"}, "current": {"type": "int"}, "total": {"type": "int"}}},
+  "backupRestoreResultTitle": "Restore results",
+  "backupServerVerified": "✓ {label}: verified",
+  "@backupServerVerified": {"placeholders": {"label": {"type": "String"}}},
+  "backupServerPending": "• {label}: could not be verified; no changes were made. Retry when the server is reachable",
+  "@backupServerPending": {"placeholders": {"label": {"type": "String"}}}
+}

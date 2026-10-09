@@ -1,0 +1,37 @@
+# FAV — peer monitor service (M15-T2). Oneshot driven by
+# wg-monitor.timer; takes one `wg show <interface> dump` snapshot per tick.
+
+[Unit]
+Description=WireGuard peer state snapshot (FAV)
+Documentation=https://github.com/Kasbrut/fav
+After=network-online.target wg-quick@wg0.service
+Wants=wg-quick@wg0.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/wg-monitor.sh
+
+# systemd manages the directories and their permissions for us — no manual
+# mkdir/chmod is required at install time, and a state-dir reset is a single
+# `systemctl stop --state-dir=...` away if we ever need it.
+StateDirectory=fav
+StateDirectoryMode=0755
+LogsDirectory=fav
+LogsDirectoryMode=0755
+RuntimeDirectory=fav
+RuntimeDirectoryMode=0755
+
+# Light sandboxing. The script needs to write only the three managed dirs
+# and read /etc/fav/monitor.env; everything else stays
+# read-only.
+ProtectSystem=strict
+ReadWritePaths=/var/lib/fav /var/log/fav /run/fav
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+[Install]
+WantedBy=multi-user.target

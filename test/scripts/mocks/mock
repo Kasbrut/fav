@@ -1,0 +1,233 @@
+#!/usr/bin/env bash
+# Generic mock for the system commands invoked by the WireGuard installer.
+#
+# One copy is symlinked under a temporary bin/ directory once per command name
+# (apt-get, useradd, wg, ...); the symlink name selects the behaviour. The
+# BATS harness tunes it through environment variables:
+#   MOCK_LOG          file every invocation is appended to (required)
+#   MOCK_FAIL         space-separated command names that should exit non-zero
+#   MOCK_USER_EXISTS  when "1", `id` succeeds (the user already exists)
+#   MOCK_KERNEL       value printed by `uname -r` (default 6.1.0-mock)
+#   MOCK_WG_PORT      UDP port reported as listening by `ss` (default 51820)
+#   MOCK_WG_DUMP      full stdout of `wg show <iface> dump` (default empty)
+#   MOCK_GETENT_HOME  home directory printed by `getent passwd <user>`
+#                     (default $WG_ROOT/home/<user>)
+set -u
+
+cmd=${0##*/}
+printf '%s %s\n' "$cmd" "$*" >>"${MOCK_LOG:?MOCK_LOG is required}"
+
+# Fail on demand so tests can exercise each module's failure path.
+case " ${MOCK_FAIL:-} " in
+  *" ${cmd} "*) exit 1 ;;
+esac
+
+case $cmd in
+  uname)
+    [[ ${1:-} == -r ]] && printf '%s\n' "${MOCK_KERNEL:-6.1.0-mock}"
+    ;;
+  id)
+    case ${1:-} in
+      -nG)
+        # Group list; MOCK_NO_SUDO drops the sudo group.
+        if [[ ${MOCK_NO_SUDO:-0} == 1 ]]; then
+          printf 'deploy users\n'
+        else
+          printf 'deploy sudo users\n'
+        fi
+        ;;
+      *)
+        # A non-zero exit means "user does not exist" (the default).
+        [[ ${MOCK_USER_EXISTS:-0} == 1 ]] || exit 1
+        ;;
+    esac
+    ;;
+  chpasswd)
+    cat >/dev/null 2>&1 || true
+    ;;
+  passwd)
+    # `passwd -S <user>` reports the password status in field 2: P (usable),
+    # L (locked), NP (no password). MOCK_PW_STATUS overrides it (default L, as
+    # for a freshly `useradd`-ed account with no password yet).
+    if [[ ${1:-} == -S ]]; then
+      printf '%s %s 01/01/2026 0 99999 7 -1\n' \
+        "${2:-user}" "${MOCK_PW_STATUS:-L}"
+    fi
+    ;;
+  wg)
+    case ${1:-} in
+      genkey) printf 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=\n' ;;
+      genpsk) printf 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB=\n' ;;
+      pubkey)
+        cat >/dev/null 2>&1 || true
+        printf 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC=\n'
+        ;;
+      show)
+        if [[ ${3:-} == dump ]]; then
+          # MOCK_WG_DUMP is a multi-line string; print it as-is so callers can
+          # supply the interface line + N peer lines.
+          if [[ -n ${MOCK_WG_DUMP:-} ]]; then
+            printf '%s\n' "$MOCK_WG_DUMP"
+          fi
+        elif [[ ${3:-} == peers ]]; then
+          # `wg show <iface> peers` lists one pubkey per line. The peer-add /
+          # peer-revoke flows record added/removed peers via `wg set` (below)
+          # into MOCK_WG_PEERS_FILE so the post-condition check can see them.
+          if [[ -n ${MOCK_WG_PEERS_FILE:-} && -f ${MOCK_WG_PEERS_FILE} ]]; then
+            cat "$MOCK_WG_PEERS_FILE"
+          fi
+        fi
+        ;;
+      set)
+        # `wg set <iface> peer <pub> [preshared-key <path>] allowed-ips <ip>`
+        # appends <pub> to MOCK_WG_PEERS_FILE; `wg set <iface> peer <pub>
+        # remove` strips it. Errors (e.g. duplicate add) are non-fatal — the
+        # mock is permissive, the real wg is authoritative in production.
+        peer_file=${MOCK_WG_PEERS_FILE:-/dev/null}
+        [[ $peer_file != /dev/null ]] && touch "$peer_file"
+        # MOCK_WG_SET_FAIL=1 forces the call to fail, so we can test rollback.
+        [[ ${MOCK_WG_SET_FAIL:-0} == 1 ]] && exit 1
+        pubkey=""
+        remove=0
+        i=2
+        # Walk args looking for `peer <pub>` and `remove`.
+        while [[ $i -le $# ]]; do
+          arg=${!i}
+          if [[ $arg == peer ]]; then
+            j=$((i + 1))
+            pubkey=${!j}
+          elif [[ $arg == remove ]]; then
+            remove=1
+          fi
+          i=$((i + 1))
+        done
+        if [[ -n $pubkey && $peer_file != /dev/null ]]; then
+          if [[ $remove == 1 ]]; then
+            # MOCK_WG_REMOVE_NOT_FOUND=1 simulates "peer not on the wire".
+            if [[ ${MOCK_WG_REMOVE_NOT_FOUND:-0} == 1 ]]; then
+              exit 1
+            fi
+            tmp=$(mktemp)
+            grep -vxF "$pubkey" "$peer_file" >"$tmp" || true
+            mv "$tmp" "$peer_file"
+          else
+            printf '%s\n' "$pubkey" >>"$peer_file"
+          fi
+        fi
+        ;;
+      *) ;;
+    esac
+    ;;
+  flock)
+    # The peer scripts wrap their critical section in `flock`. In tests we
+    # just succeed — the BATS suite is single-threaded — and let MOCK_FAIL
+    # force a failure when the test wants to exercise that branch.
+    :
+    ;;
+  sysctl)
+    # The v2 firewall manager snapshots each current value before changing it
+    # and validates that snapshot on subsequent reconciliation passes.
+    [[ ${1:-} == -n ]] && printf '0\n'
+    ;;
+  ip)
+    # Serve the route lookups used by both the legacy helpers and the v2
+    # network probe. The harness has IPv4 connectivity but no delegated IPv6
+    # route, so the probe deterministically selects blocked/ULA mode.
+    if [[ ${1:-} == route && ${2:-} == show && ${3:-} == default ]] ||
+      [[ ${1:-} == -4 && ${2:-} == route && ${3:-} == show && ${4:-} == default ]]; then
+      printf '%s\n' "${MOCK_IP_ROUTE:-default via 10.0.0.1 dev eth0 proto dhcp}"
+    elif [[ ${1:-} == -6 && ${2:-} == route && ${3:-} == show && ${4:-} == default ]]; then
+      :
+    elif [[ ${1:-} == netns && ${2:-} == list ]]; then
+      :
+    elif [[ ${1:-} == link && ${2:-} == show && ${3:-} == dev ]]; then
+      # The probe's deterministic temporary link must not pre-exist.
+      exit 1
+    fi
+    ;;
+  ss)
+    printf 'UNCONN 0 0 0.0.0.0:%s 0.0.0.0:*\n' "${MOCK_WG_PORT:-51820}"
+    ;;
+  iptables|ip6tables)
+    if [[ ${1:-} == --version ]]; then
+      printf '%s v1.8.10 (nf_tables)\n' "$cmd"
+      exit 0
+    fi
+    # `-C` (check) fails so the module proceeds to add the rule. When
+    # MOCK_IPTABLES_PRESENT names a counter file, `-C` instead reports the
+    # rule present that many times (decrementing) — lets the teardown
+    # tests exercise the `-D` delete loops and prove they terminate.
+    for arg in "$@"; do
+      if [[ $arg == -C ]]; then
+        if [[ -n ${MOCK_IPTABLES_PRESENT:-} ]]; then
+          count=$(cat "$MOCK_IPTABLES_PRESENT" 2>/dev/null || printf 0)
+          if [[ $count -gt 0 ]]; then
+            printf '%s' "$((count - 1))" >"$MOCK_IPTABLES_PRESENT"
+            exit 0
+          fi
+        fi
+        exit 1
+      fi
+    done
+    ;;
+  sshd)
+    # `sshd -t [-f file]` → syntax check: succeed (MOCK_FAIL forces failure).
+    # `sshd -T [-f file]` → dump the EFFECTIVE global config. Real sshd applies
+    # only global directives here (Match needs -C and is skipped) with
+    # first-value-wins semantics, falling back to the compiled defaults. We
+    # emulate that for the keys the hardening scripts verify so the `sshd -T`
+    # safety net is exercised in tests.
+    dump=0
+    cfgfile=""
+    i=1
+    while [[ $i -le $# ]]; do
+      case ${!i} in
+        -T) dump=1 ;;
+        -f) j=$((i + 1)); cfgfile=${!j:-} ;;
+      esac
+      i=$((i + 1))
+    done
+    if [[ $dump == 1 ]]; then
+      pa="" ka="" pr=""
+      if [[ -n $cfgfile && -f $cfgfile ]]; then
+        while IFS= read -r line; do
+          read -r kw val _ <<<"$line"
+          case $kw in
+            Match) break ;;
+            PasswordAuthentication) [[ -z $pa ]] && pa=$val ;;
+            KbdInteractiveAuthentication) [[ -z $ka ]] && ka=$val ;;
+            PermitRootLogin) [[ -z $pr ]] && pr=$val ;;
+          esac
+        done <"$cfgfile"
+      fi
+      # Real sshd -T prints canonical lowercase values and normalizes the
+      # deprecated `without-password` alias to `prohibit-password`.
+      pa=$(printf '%s' "$pa" | tr '[:upper:]' '[:lower:]')
+      ka=$(printf '%s' "$ka" | tr '[:upper:]' '[:lower:]')
+      pr=$(printf '%s' "$pr" | tr '[:upper:]' '[:lower:]')
+      [[ $pr == without-password ]] && pr='prohibit-password'
+      # MOCK_SSHD_T_PA_OVERRIDE simulates a drop-in overriding the main
+      # file: the reported effective value diverges from what was written.
+      printf 'passwordauthentication %s\n' \
+        "${MOCK_SSHD_T_PA_OVERRIDE:-${pa:-yes}}"
+      printf 'kbdinteractiveauthentication %s\n' "${ka:-yes}"
+      printf 'permitrootlogin %s\n' \
+        "${MOCK_SSHD_T_PR_OVERRIDE:-${pr:-prohibit-password}}"
+    fi
+    ;;
+  systemctl)
+    # MOCK_SSHD_INACTIVE makes `is-active` report the daemon as down.
+    [[ ${1:-} == is-active && ${MOCK_SSHD_INACTIVE:-0} == 1 ]] && exit 1
+    ;;
+  getent)
+    # `getent passwd <user>` returns a fake passwd line whose home is under
+    # ${WG_ROOT}/home/<user> by default, so the installer can mkdir into the
+    # sandbox; MOCK_GETENT_HOME overrides it.
+    if [[ ${1:-} == passwd && -n ${2:-} ]]; then
+      mock_home=${MOCK_GETENT_HOME:-${WG_ROOT:-}/home/${2}}
+      printf '%s:x:1000:1000::%s:/bin/bash\n' "$2" "$mock_home"
+    fi
+    ;;
+  *) ;;
+esac
+exit 0

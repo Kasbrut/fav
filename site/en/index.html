@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="FAV provisions a dedicated WireGuard server over SSH, without a hosted control plane.">
+    <meta name="theme-color" content="#f7f7fa">
+    <title>FAV — Your WireGuard server, under your control</title>
+    <link rel="stylesheet" href="../assets/site.css">
+    <link rel="icon" href="../assets/favicon.png">
+  </head>
+  <body>
+    <a class="skip-link" href="#content">Skip to content</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="./"><img src="../assets/favicon.png" alt="">FAV</a>
+        <nav class="nav" aria-label="Main navigation">
+          <a href="./" aria-current="page">Overview</a>
+          <a href="getting-started.html">Get started</a>
+          <a href="downloads.html">Downloads</a>
+          <a href="security.html">Security</a>
+          <a href="support.html">Support</a>
+          <span class="language" aria-label="Current language">English</span>
+        </nav>
+      </div>
+    </header>
+
+    <main id="content" class="page">
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>Your server. Your VPN.</h1>
+          <p>FAV turns a dedicated Debian or Ubuntu server into a WireGuard endpoint. It connects directly over SSH, runs inspectable setup scripts, and helps you manage client profiles from one app.</p>
+          <div class="actions">
+            <a class="button primary" href="getting-started.html">Read the setup guide</a>
+            <a class="button" href="https://github.com/Kasbrut/fav">View the source</a>
+          </div>
+        </div>
+        <aside class="release-note" aria-label="Release status">
+          <strong>Early-release software</strong>
+          <p>Use a dedicated server and keep your provider’s recovery console available. FAV changes SSH, firewall and network configuration.</p>
+        </aside>
+      </section>
+
+      <section class="section" aria-labelledby="how-it-works">
+        <div class="section-heading">
+          <h2 id="how-it-works">From a fresh server to a working tunnel</h2>
+          <p>FAV handles the server side. You still use the official WireGuard app, or another compatible client, to connect.</p>
+        </div>
+        <div class="steps">
+          <article class="step"><span>1</span><h3>Connect</h3><p>Enter the server address and SSH credentials. Passwords are used for the current operation and are not stored.</p></article>
+          <article class="step"><span>2</span><h3>Verify</h3><p>Compare the SSH fingerprint with your provider’s console before trusting the server for the first time.</p></article>
+          <article class="step"><span>3</span><h3>Provision</h3><p>Follow each installation step. The detached installer can recover after an app restart or a network change.</p></article>
+          <article class="step"><span>4</span><h3>Import</h3><p>Create one peer per device, then import its profile into WireGuard using a file or QR code.</p></article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="manage">
+        <div class="section-heading">
+          <h2 id="manage">Manage it without leaving the app</h2>
+          <p>Once the server is running, FAV remains a practical administration tool rather than a one-time installer.</p>
+        </div>
+        <div class="feature-list">
+          <article><h3>Peers and profiles</h3><p>Add, rename and revoke peers. Export each client profile as a configuration file or show its QR code for another mobile device.</p></article>
+          <article><h3>Live status and history</h3><p>Review recent handshakes, traffic and connection history so you can tell which peers are active and when they last connected.</p></article>
+          <article><h3>Built-in SSH shell</h3><p>Open an interactive terminal to a managed server. It uses the same pinned host identity and protected credentials as other FAV operations.</p></article>
+          <article><h3>Encrypted backup and restore</h3><p>Move your managed servers, SSH identities, peer profiles and transferable settings to a clean device using a password-encrypted backup. Restore checks each reachable server before completing.</p></article>
+          <article><h3>Access and cleanup</h3><p>Add your own SSH public keys, check the WireGuard port, and remove either FAV's local record or the services it installed on the server.</p></article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="boundaries">
+        <div class="section-heading"><h2 id="boundaries">Clear boundaries matter</h2></div>
+        <div class="truth-grid">
+          <article><h3>No hosted control plane</h3><p>The app talks directly to your server. FAV has no account system, subscription or remote service that controls your installation.</p></article>
+          <article><h3>Not a VPN client</h3><p>FAV creates and manages WireGuard profiles. A separate WireGuard client installs the tunnel on each device.</p></article>
+          <article><h3>Designed for dedicated servers</h3><p>Provisioning changes shared network and SSH configuration. Do not use a machine that carries unrelated production workloads.</p></article>
+          <article><h3>Recovery remains your responsibility</h3><p>Safeguards reduce lockout risk, but they cannot replace provider-console access or an independently tested SSH key.</p></article>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="read-next">
+        <div class="section-heading"><h2 id="read-next">Read before installing</h2><p>The useful details are kept close to the decisions they affect.</p></div>
+        <ul class="link-list">
+          <li><a href="getting-started.html"><strong>Getting started</strong><span>Server requirements, firewall rules and first installation.</span></a></li>
+          <li><a href="downloads.html"><strong>Downloads</strong><span>Supported platforms, release status and checksum verification.</span></a></li>
+          <li><a href="security.html"><strong>Security</strong><span>Host-key verification, credential storage, hardening and known limits.</span></a></li>
+          <li><a href="privacy.html"><strong>Privacy</strong><span>What the app stores, what it contacts and what it never collects.</span></a></li>
+          <li><a href="support.html"><strong>Support</strong><span>Troubleshooting, diagnostics and responsible vulnerability reporting.</span></a></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>FAV is free software licensed under GPLv3.</p>
+      <nav class="footer-links" aria-label="Footer navigation"><a href="privacy.html">Privacy</a><a href="https://github.com/Kasbrut/fav">GitHub</a></nav>
+    </footer>
+  </body>
+</html>
