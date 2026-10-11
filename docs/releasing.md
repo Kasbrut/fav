@@ -65,6 +65,9 @@ fixes or unverified release artifacts.
    Linux x64 AppImage/DEB packages, hashes them and publishes them with the tag.
 6. Verify a fresh install from the exact reviewed commit. Publish release notes
    describing the automatic IPv6 policy, client limits and known limitations.
+7. Keep the Android signing boundary explicit: Google Play builds and GitHub
+   APKs are separate update channels. Document the backup, uninstall and restore
+   procedure required when users switch channels.
 
 App Store/Play publication, Apple certificates/notarization and store metadata
 are separate release operations; the source repository does not configure

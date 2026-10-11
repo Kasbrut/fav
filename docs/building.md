@@ -80,10 +80,15 @@ keyPassword=YOUR_KEY_PASSWORD
 ```
 
 Use an absolute path; escape Windows backslashes as `\\` in properties files.
-Do not commit this file or the keystore. Keep the same key for future sideload
-updates. Changing the key normally requires uninstalling the old app, which
-can destroy access to its local credentials. Google Play has a separate app
-signing/upload-key workflow; plan it before distributing your first build.
+Do not commit this file or the keystore. Keep the same key for future GitHub
+and other sideload updates. Changing the key normally requires uninstalling
+the old app, which can destroy access to its local credentials.
+
+Google Play uses its own app-signing key; the release keystore is its upload
+key and signs the APKs published on GitHub. These deliberately isolated update
+channels cannot update each other. Switching between them requires exporting
+a FAV backup, uninstalling the app, reinstalling it from the new channel and
+restoring the backup.
 
 Equivalent environment variables are `FAV_KEYSTORE_PATH`, `FAV_STORE_PASSWORD`,
 `FAV_KEY_ALIAS` and `FAV_KEY_PASSWORD` (they override the properties file).
