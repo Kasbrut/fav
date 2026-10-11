@@ -1,9 +1,9 @@
 # Full-tunnel IPv4/IPv6 — implementation contract v2
 
-Status: design for implementation, not a description of shipped behaviour.
-Phase 0, 2026-09-17. Existing application baseline: `26ecb95`.
-Changes to this contract must be reviewed by the coordinating agent before an
-implementation agent changes the corresponding behaviour.
+Status: implemented before FAV 1.0.0. This is the original design contract and
+is retained as an architecture record. Current code, tests, the user guide and
+the security model are authoritative if implementation details have changed.
+Original design baseline: `26ecb95`, 2026-09-17.
 
 ## Product invariants
 
@@ -310,6 +310,7 @@ Required gates before release:
 4. Validate per-platform external protections and instructions separately from
    basic profile routing. No runtime cross-platform kill-switch promise.
 
-Real server/client tests are pending. No server credentials or disposable-device
-matrix were supplied for phase 0; do not contact existing servers or fabricate
-certification. These gates do not prevent implementing pure T1/T2 components.
+The design was subsequently exercised through automated tests and disposable
+server/client testing. Current coverage and remaining limitations are recorded
+in [security-testing.md](../security-testing.md); this historical contract does
+not itself certify a release.

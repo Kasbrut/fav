@@ -1,7 +1,9 @@
 # Security Testing
 
 FAV has been tested beyond basic installation and happy-path checks. The
-following security-relevant tests have been completed.
+following security-relevant checks were completed during development of the
+1.0.0 release. They describe observed behavior in the tested environments, not
+a formal certification or a guarantee for every provider, device or network.
 
 ## Real server testing
 
@@ -67,10 +69,10 @@ following security-relevant tests have been completed.
   and back. When the VPS WireGuard port was deliberately blocked, new traffic
   stopped instead of falling back outside the active tunnel, then recovered
   after the port was restored.
-- Concurrent VPS captures recorded 28,078 decrypted packets on the WireGuard
-  interface and 32,476 WireGuard UDP packets on the public interface. The
-  pre-existing Docker service remained available throughout provisioning and
-  tunnel tests.
+- Concurrent server captures confirmed decrypted traffic only on the WireGuard
+  interface and encrypted WireGuard UDP traffic on the public interface. A
+  pre-existing Docker service remained available throughout that test, but
+  shared hosts are not generally supported or recommended.
 - Android full-tunnel routing was verified for IPv4 and IPv6, including VPN
   DNS selection and live server-side handshake and traffic counters.
 - With the WireGuard endpoint deliberately blocked, the active tunnel did not

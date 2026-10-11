@@ -2,9 +2,9 @@
 
 ## Audit scope
 
-Review these areas before the first public import and before releases touching
-them. Passing unit tests is not a substitute for native or disposable-server
-testing.
+Review these areas before every release, with extra scrutiny when a release
+changes them. Passing unit tests is not a substitute for native or
+disposable-server testing.
 
 - Code: validation, shell escaping, SSH host-key verification, key-only checks,
   password lifetime, retries/timeouts, failure cleanup, peer add/revoke and
@@ -43,9 +43,10 @@ fixes or unverified release artifacts.
   or a ruleset. Do not require a status until it has run in the repository.
 - Review Dependabot/security alerts and repository metadata. Check links in
   the app's report and donation screens before each release.
-- Configure the four Android signing secrets from [building.md](building.md).
-  Keep the keystore backup outside Git. Test with a manual release workflow
-  run before pushing the first release tag.
+- Keep the four Android signing secrets from [building.md](building.md)
+  available and verify their configuration before release. Keep the keystore
+  backup outside Git. Test signing changes with a manual release workflow run
+  before pushing a tag.
 
 ## Binary release
 
