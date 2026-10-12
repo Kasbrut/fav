@@ -93,14 +93,19 @@ class BackupCodec {
       final iterations = kdf['iterations'] as int;
       final parallelism = kdf['parallelism'] as int;
       if (memory < 8 * 1024 ||
-          memory > 256 * 1024 ||
+          memory > 64 * 1024 ||
           iterations < 1 ||
-          iterations > 10 ||
-          parallelism < 1 ||
-          parallelism > 8) {
+          iterations > 3 ||
+          parallelism != 1) {
         throw const BackupFormatException('invalid backup parameters');
       }
       final salt = base64Decode(kdf['salt'] as String);
+      final nonce = base64Decode(cipherData['nonce'] as String);
+      final cipherText = base64Decode(cipherData['cipherText'] as String);
+      final mac = base64Decode(cipherData['mac'] as String);
+      if (salt.length != 16 || nonce.length != 12 || mac.length != 16) {
+        throw const BackupFormatException('invalid backup encryption data');
+      }
       final key = await _deriveKey(
         password: password,
         salt: salt,
@@ -109,9 +114,9 @@ class BackupCodec {
         parallelism: parallelism,
       );
       final box = SecretBox(
-        base64Decode(cipherData['cipherText'] as String),
-        nonce: base64Decode(cipherData['nonce'] as String),
-        mac: Mac(base64Decode(cipherData['mac'] as String)),
+        cipherText,
+        nonce: nonce,
+        mac: Mac(mac),
       );
       final clear = await AesGcm.with256bits().decrypt(box, secretKey: key);
       final payload = jsonDecode(utf8.decode(clear));

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:fav/features/settings/data/backup_codec.dart';
@@ -9,6 +10,18 @@ void main() {
     iterations: 1,
     random: Random(42),
   );
+
+  Future<List<int>> alteredEnvelope(
+    void Function(Map<String, dynamic>) alter,
+  ) async {
+    final bytes = await codec().encrypt(
+      payload: <String, Object?>{'schemaVersion': 1},
+      password: 'correct password',
+    );
+    final envelope = jsonDecode(utf8.decode(bytes)) as Map<String, dynamic>;
+    alter(envelope);
+    return utf8.encode(jsonEncode(envelope));
+  }
 
   test('round-trips an authenticated payload', () async {
     final bytes = await codec().encrypt(
@@ -57,5 +70,51 @@ void main() {
       codec().decrypt(bytes: bytes, password: 'correct password'),
       throwsA(isA<BackupFormatException>()),
     );
+  });
+
+  test('rejects KDF costs above the app policy before deriving', () async {
+    final excessiveCosts = <String, int>{
+      'memoryKiB': 64 * 1024 + 1,
+      'iterations': 4,
+      'parallelism': 2,
+    };
+    for (final entry in excessiveCosts.entries) {
+      final bytes = await alteredEnvelope((envelope) {
+        (envelope['kdf'] as Map<String, dynamic>)[entry.key] = entry.value;
+      });
+
+      await expectLater(
+        codec().decrypt(bytes: bytes, password: 'wrong password'),
+        throwsA(
+          isA<BackupFormatException>().having(
+            (error) => error.message,
+            'message',
+            'invalid backup parameters',
+          ),
+        ),
+        reason: 'excessive ${entry.key} must fail before password derivation',
+      );
+    }
+  });
+
+  test('rejects malformed salt, nonce and MAC before deriving', () async {
+    for (final field in ['salt', 'nonce', 'mac']) {
+      final bytes = await alteredEnvelope((envelope) {
+        final section = field == 'salt' ? 'kdf' : 'cipher';
+        (envelope[section] as Map<String, dynamic>)[field] = base64Encode([1]);
+      });
+
+      await expectLater(
+        codec().decrypt(bytes: bytes, password: 'wrong password'),
+        throwsA(
+          isA<BackupFormatException>().having(
+            (error) => error.message,
+            'message',
+            'invalid backup encryption data',
+          ),
+        ),
+        reason: 'malformed $field must fail before password derivation',
+      );
+    }
   });
 }
