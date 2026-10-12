@@ -27,7 +27,9 @@ setup() {
   [[ "$output" == *'kbdinteractiveauthentication no'* ]]
   run "$REAL_SSHD" -T -f "$WG_ROOT/etc/ssh/sshd_config" -C user=root,addr=192.0.2.10,host=example.test
   [ "$status" -eq 0 ]
-  [[ "$output" == *'permitrootlogin prohibit-password'* ]]
+  # OpenSSH versions serialize this equivalent setting under either name.
+  [[ "$output" == *'permitrootlogin prohibit-password'* ||
+     "$output" == *'permitrootlogin without-password'* ]]
   cp "$WG_ROOT/etc/ssh/sshd_config" "$BATS_TEST_TMPDIR/original"
   run bash "$SCRIPTS_DIR/disable_root_ssh.sh"
   [ "$status" -ne 0 ]
