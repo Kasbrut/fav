@@ -38,12 +38,19 @@ rollback_sshd() {
 }
 
 # Audit every reachable Include, regardless of Match conditions. A global
-# sshd -T cannot prove that all users/addresses are safe. Reject any permissive
-# directive even if an earlier value might override it; do not sample users.
+# sshd -T cannot prove that all users/addresses are safe. The forced leading
+# globals override later global values, but Match values can override them.
+# Includes inherit and change the surrounding scope; even Match all remains
+# conditional. Reject every permissive conditional value; do not sample users.
 # Relative Include paths are rooted at /etc/ssh (not the including file).
 # Only unquoted paths are resolved here. Ambiguous quoting/escaping, unreadable
 # files and excessive recursion fail closed. No config text is evaluated.
 included_policy_safe() {
+  local policy_match_scope=0
+  audit_policy_file "$1" "$2" 0
+}
+
+audit_policy_file() {
   local config=$1 policy=$2 depth=${3:-0}
   local line key value pattern included
   local -a patterns
@@ -67,17 +74,20 @@ included_policy_safe() {
         [[ $pattern == /* ]] || pattern="${WG_ROOT:-}/etc/ssh/$pattern"
         # compgen expands globs without evaluating shell substitutions.
         while IFS= read -r included; do
-          included_policy_safe "$included" "$policy" "$((depth + 1))" || return 1
-        done < <(compgen -G "$pattern" || true)
+          audit_policy_file "$included" "$policy" "$((depth + 1))" || return 1
+        done < <(compgen -G "$pattern" | LC_ALL=C sort || true)
       done
-    elif [[ $policy == password ]]; then
+    elif [[ $key == match ]]; then
+      [[ -n $value ]] || return 1
+      policy_match_scope=1
+    elif (( policy_match_scope )) && [[ $policy == password ]]; then
       case $key in
         passwordauthentication|kbdinteractiveauthentication|challengeresponseauthentication)
           [[ ${value,,} == no ]] || return 1 ;;
         pubkeyauthentication)
           [[ ${value,,} == yes ]] || return 1 ;;
       esac
-    elif [[ $key == permitrootlogin ]]; then
+    elif (( policy_match_scope )) && [[ $key == permitrootlogin ]]; then
       [[ ${value,,} == no ]] || return 1
     fi
   done <"$config"

@@ -941,6 +941,15 @@ class InstallController extends Notifier<InstallFlowState> {
     var hardeningApplied = false;
     AppException? hardeningWarning;
     final keyPair = _appKeyPair;
+    // Recovery cannot replay privileged post-install work: the management
+    // user's sudo password is not persisted. Keep that omission visible when
+    // this run requested hardening, rather than reporting an ordinary success.
+    if (_options.enableHardening && (!_wantsHardening || keyPair == null)) {
+      hardeningWarning = const AppException(
+        ErrorCode.lockoutAborted,
+        detail: 'requested SSH hardening was not run or verified',
+      );
+    }
     if (_wantsHardening && keyPair != null) {
       state = InstallHardening(run);
       try {

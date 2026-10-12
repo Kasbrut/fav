@@ -46,6 +46,33 @@ setup() {
   grep -q '^PermitRootLogin no' "$WG_ROOT/etc/ssh/sshd_config"
 }
 
+@test "real sshd preserves forced root global over cloud-init and inherits Match through Includes" {
+  [[ -n $REAL_SSHD ]] || skip 'real sshd unavailable'
+  command -v ssh-keygen >/dev/null || skip 'ssh-keygen unavailable'
+  ssh-keygen -q -t ed25519 -N '' -f "$BATS_TEST_TMPDIR/hostkey"
+  mkdir -p "$WG_ROOT/etc/ssh/custom"
+  printf 'PermitRootLogin yes\n' >"$WG_ROOT/etc/ssh/custom/cloud.conf"
+  printf 'HostKey %s/hostkey\nInclude %s/etc/ssh/custom/cloud.conf\nPermitRootLogin no\n' "$BATS_TEST_TMPDIR" "$WG_ROOT" >"$WG_ROOT/etc/ssh/sshd_config"
+  run bash "$SCRIPTS_DIR/disable_root_ssh.sh"
+  [ "$status" -eq 0 ]
+  for context in '' 'user=root,addr=192.0.2.10,host=example.test'; do
+    args=()
+    [[ -z $context ]] || args=(-C "$context")
+    run "$REAL_SSHD" -T -f "$WG_ROOT/etc/ssh/sshd_config" "${args[@]}"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *'permitrootlogin no'* ]]
+  done
+  printf 'Match User root\nInclude %s/etc/ssh/custom/inner.conf\n' "$WG_ROOT" >"$WG_ROOT/etc/ssh/custom/outer.conf"
+  printf 'PermitRootLogin yes\n' >"$WG_ROOT/etc/ssh/custom/inner.conf"
+  printf 'Include %s/etc/ssh/custom/outer.conf\n' "$WG_ROOT" >>"$WG_ROOT/etc/ssh/sshd_config"
+  run "$REAL_SSHD" -T -f "$WG_ROOT/etc/ssh/sshd_config" -C user=root,addr=192.0.2.10,host=example.test
+  [ "$status" -eq 0 ]
+  [[ "$output" == *'permitrootlogin yes'* ]]
+  run bash "$SCRIPTS_DIR/disable_root_ssh.sh"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *WG-LCK-ABORTED* ]]
+}
+
 @test "disable_root_ssh keeps PermitRootLogin global when config ends with a Match block" {
   cat >"$WG_ROOT/etc/ssh/sshd_config" <<EOF
 PermitRootLogin yes
@@ -92,24 +119,42 @@ EOF
   grep -q '^PermitRootLogin yes' "$WG_ROOT/etc/ssh/sshd_config"
 }
 
-@test "disable_root_ssh aborts when a drop-in still permits root login" {
+@test "disable_root_ssh overrides global cloud-init root login before Include" {
   mkdir -p "$WG_ROOT/etc/ssh/sshd_config.d"
-  printf 'Include %s/etc/ssh/sshd_config.d/*.conf\n' "$WG_ROOT" >>"$WG_ROOT/etc/ssh/sshd_config"
+  printf 'Include %s/etc/ssh/sshd_config.d/*.conf\nPermitRootLogin no\n' "$WG_ROOT" >"$WG_ROOT/etc/ssh/sshd_config"
   printf 'PermitRootLogin yes\n' \
     >"$WG_ROOT/etc/ssh/sshd_config.d/99-cloud-init.conf"
   run bash "$SCRIPTS_DIR/disable_root_ssh.sh"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *WG-LCK-ABORTED* ]]
+  [ "$status" -eq 0 ]
+  [[ "$output" == *WG-LCK-OK* ]]
+  grep -qx 'PermitRootLogin yes' "$WG_ROOT/etc/ssh/sshd_config.d/99-cloud-init.conf"
 }
 
-@test "disable_root_ssh aborts on a prohibit-password drop-in" {
+@test "disable_root_ssh overrides a global prohibit-password drop-in" {
   mkdir -p "$WG_ROOT/etc/ssh/sshd_config.d"
   printf 'Include %s/etc/ssh/sshd_config.d/*.conf\n' "$WG_ROOT" >>"$WG_ROOT/etc/ssh/sshd_config"
   printf 'PermitRootLogin prohibit-password\n' \
     >"$WG_ROOT/etc/ssh/sshd_config.d/60-cloudimg.conf"
   run bash "$SCRIPTS_DIR/disable_root_ssh.sh"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *WG-LCK-ABORTED* ]]
+  [ "$status" -eq 0 ]
+  [[ "$output" == *WG-LCK-OK* ]]
+}
+
+@test "disable_root_ssh carries Match scope through nested and sorted sibling Includes" {
+  mkdir -p "$WG_ROOT/etc/ssh/custom"
+  printf 'Include custom/inner.conf\n' >"$WG_ROOT/etc/ssh/custom/20-auth.conf"
+  printf 'Match User deploy\n' >"$WG_ROOT/etc/ssh/custom/10-match.conf"
+  printf 'PermitRootLogin yes\n' >"$WG_ROOT/etc/ssh/custom/inner.conf"
+  for includes in 'Include custom/[12]*.conf' 'Match all\nInclude custom/20-auth.conf' 'Include custom/10-match.conf\nInclude custom/20-auth.conf'; do
+    printf 'PermitRootLogin yes\n%b\n' "$includes" >"$WG_ROOT/etc/ssh/sshd_config"
+    cp "$WG_ROOT/etc/ssh/sshd_config" "$BATS_TEST_TMPDIR/original"
+    run bash "$SCRIPTS_DIR/disable_root_ssh.sh"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *WG-LCK-ABORTED* ]]
+    cmp "$BATS_TEST_TMPDIR/original" "$WG_ROOT/etc/ssh/sshd_config"
+    run mock_called systemctl
+    [ "$status" -ne 0 ]
+  done
 }
 
 @test "disable_root_ssh rejects every permissive value in nested nonstandard Include Match rules" {

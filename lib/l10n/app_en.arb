@@ -647,7 +647,7 @@
   "stepEnableForwarding": "Enable IP forwarding",
   "stepFirewall": "Configure firewall",
   "stepStartService": "Start service",
-  "stepHardening": "Apply hardening",
+  "stepHardening": "Configure brute-force protection",
   "stepHealthCheck": "Health check",
   "stepFinalize": "Finalize",
   "scriptHashLabel": "Script SHA-256",
@@ -780,7 +780,7 @@
   "hardeningInProgress": "Applying SSH hardening…",
   "hardeningApplied": "SSH password authentication disabled; key-only login is enforced.",
   "hardeningIncompleteTitle": "SSH hardening was not fully applied",
-  "hardeningWarning": "Password authentication was left enabled because key-based login could not be verified. The server is still reachable as before.",
+  "hardeningWarning": "SSH hardening was not verified. Password login may still be available. Check the server's SSH configuration before relying on key-only access.",
   "configBackupDone": "Existing configuration backed up to {path}.",
   "@configBackupDone": {
     "description": "Shown after install when a previous config was backed up.",

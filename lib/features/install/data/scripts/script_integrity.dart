@@ -11,9 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// which recomputes the hashes from the real asset files and fails on drift.
 const Map<String, String> kBundledScriptHashes = {
   'disable_password_auth.sh':
-      '1d10840f8b94fb60329c59b06f2ec3241bf7fe01b64b54f25b5b297508c534f0',
+      'a5842cb4ad7e776b2db5508b9303bae5e48ba021228906fae16eaa458d246a2c',
   'disable_root_ssh.sh':
-      '9180e0a9578333fbb1ea7d654e86995c71a62c5c7644bc038b688f94b51e83ed',
+      '2c686cf7f639b3eff452f4592e944d9c9b654dfc792f9f898a89bc0811a5da47',
   'install_monitor.sh':
       '41f3ac5824815e461de4dcf2136f551186cd7c924312fc8342090071bec47278',
   'install_wireguard.sh':
@@ -84,7 +84,7 @@ const Map<String, String> kBundledScriptHashes = {
 
 /// Expected canonical hash over the whole bundled script set (spec §8.6).
 const String kBundledScriptSetHash =
-    'cf368c62f5360539c51fe8be5953451594e5b4968481e847f8fb175e7be8a707';
+    '9efe9b9c57b2ba4019d61a813163458961b49be0ba90ef6f0277429ba8dd8264';
 
 /// Verifies the bundled scripts against the compiled-in hashes (spec §8.6).
 class ScriptIntegrityVerifier {

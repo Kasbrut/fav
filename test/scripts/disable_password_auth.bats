@@ -50,6 +50,35 @@ EOF
   grep -qx 'KbdInteractiveAuthentication no' "$WG_ROOT/etc/ssh/sshd_config"
 }
 
+@test "real sshd preserves forced globals over cloud-init and inherits Match through Includes" {
+  [[ -n $REAL_SSHD ]] || skip 'real sshd unavailable'
+  command -v ssh-keygen >/dev/null || skip 'ssh-keygen unavailable'
+  ssh-keygen -q -t ed25519 -N '' -f "$BATS_TEST_TMPDIR/hostkey"
+  mkdir -p "$WG_ROOT/etc/ssh/custom"
+  printf 'PasswordAuthentication yes\nKbdInteractiveAuthentication yes\nPubkeyAuthentication no\n' >"$WG_ROOT/etc/ssh/custom/cloud.conf"
+  printf 'HostKey %s/hostkey\nInclude %s/etc/ssh/custom/cloud.conf\nPasswordAuthentication no\n' "$BATS_TEST_TMPDIR" "$WG_ROOT" >"$WG_ROOT/etc/ssh/sshd_config"
+  run bash "$SCRIPTS_DIR/disable_password_auth.sh"
+  [ "$status" -eq 0 ]
+  for context in '' 'user=deploy,addr=192.0.2.10,host=example.test'; do
+    args=()
+    [[ -z $context ]] || args=(-C "$context")
+    run "$REAL_SSHD" -T -f "$WG_ROOT/etc/ssh/sshd_config" "${args[@]}"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *'passwordauthentication no'* ]]
+    [[ "$output" == *'kbdinteractiveauthentication no'* ]]
+    [[ "$output" == *'pubkeyauthentication yes'* ]]
+  done
+  printf 'Match User deploy\nInclude %s/etc/ssh/custom/inner.conf\n' "$WG_ROOT" >"$WG_ROOT/etc/ssh/custom/outer.conf"
+  printf 'PasswordAuthentication yes\n' >"$WG_ROOT/etc/ssh/custom/inner.conf"
+  printf 'Include %s/etc/ssh/custom/outer.conf\n' "$WG_ROOT" >>"$WG_ROOT/etc/ssh/sshd_config"
+  run "$REAL_SSHD" -T -f "$WG_ROOT/etc/ssh/sshd_config" -C user=deploy,addr=192.0.2.10,host=example.test
+  [ "$status" -eq 0 ]
+  [[ "$output" == *'passwordauthentication yes'* ]]
+  run bash "$SCRIPTS_DIR/disable_password_auth.sh"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *WG-HRD-ABORTED* ]]
+}
+
 @test "disable_password_auth removes any commented PasswordAuthentication" {
   cat >"$WG_ROOT/etc/ssh/sshd_config" <<EOF
 PermitRootLogin no
@@ -104,14 +133,33 @@ EOF
   [ "$pa_line" -lt "$match_line" ]
 }
 
-@test "disable_password_auth aborts when a drop-in re-enables password auth" {
+@test "disable_password_auth overrides global cloud-init password auth before Include" {
   mkdir -p "$WG_ROOT/etc/ssh/sshd_config.d"
-  printf 'Include %s/etc/ssh/sshd_config.d/*.conf\n' "$WG_ROOT" >>"$WG_ROOT/etc/ssh/sshd_config"
-  printf 'PasswordAuthentication yes\n' \
+  printf 'Include %s/etc/ssh/sshd_config.d/*.conf\nPasswordAuthentication no\n' "$WG_ROOT" >"$WG_ROOT/etc/ssh/sshd_config"
+  printf 'PasswordAuthentication yes\nKbdInteractiveAuthentication yes\nPubkeyAuthentication no\n' \
     >"$WG_ROOT/etc/ssh/sshd_config.d/50-cloud-init.conf"
   run bash "$SCRIPTS_DIR/disable_password_auth.sh"
-  [ "$status" -ne 0 ]
-  [[ "$output" == *WG-HRD-ABORTED* ]]
+  [ "$status" -eq 0 ]
+  [[ "$output" == *WG-HRD-OK* ]]
+  grep -qx 'PasswordAuthentication yes' "$WG_ROOT/etc/ssh/sshd_config.d/50-cloud-init.conf"
+}
+
+@test "disable_password_auth carries Match scope through nested and sorted sibling Includes" {
+  mkdir -p "$WG_ROOT/etc/ssh/custom"
+  # Create in reverse order: evaluation must still visit 10 before 20.
+  printf 'Include custom/inner.conf\n' >"$WG_ROOT/etc/ssh/custom/20-auth.conf"
+  printf 'Match User deploy\n' >"$WG_ROOT/etc/ssh/custom/10-match.conf"
+  printf 'PasswordAuthentication yes\n' >"$WG_ROOT/etc/ssh/custom/inner.conf"
+  for includes in 'Include custom/[12]*.conf' 'Match all\nInclude custom/20-auth.conf' 'Include custom/10-match.conf\nInclude custom/20-auth.conf'; do
+    printf 'PasswordAuthentication yes\n%b\n' "$includes" >"$WG_ROOT/etc/ssh/sshd_config"
+    cp "$WG_ROOT/etc/ssh/sshd_config" "$BATS_TEST_TMPDIR/original"
+    run bash "$SCRIPTS_DIR/disable_password_auth.sh"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *WG-HRD-ABORTED* ]]
+    cmp "$BATS_TEST_TMPDIR/original" "$WG_ROOT/etc/ssh/sshd_config"
+    run mock_called systemctl
+    [ "$status" -ne 0 ]
+  done
 }
 
 @test "disable_password_auth rejects nested nonstandard Includes and all Match password paths" {

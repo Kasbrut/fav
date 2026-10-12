@@ -1,7 +1,9 @@
 import 'package:fav/core/errors/app_exception.dart';
 import 'package:fav/core/theme/app_theme.dart';
 import 'package:fav/features/install/application/install_controller.dart';
+import 'package:fav/features/install/application/run_polling_controller.dart';
 import 'package:fav/features/install/domain/install_run.dart';
+import 'package:fav/features/install/domain/install_step.dart';
 import 'package:fav/features/install/presentation/install_progress_screen.dart';
 import 'package:fav/features/servers/data/hive_server_repository.dart';
 import 'package:fav/l10n/app_localizations.dart';
@@ -26,6 +28,11 @@ class _FixedInstallController extends InstallController {
 
   @override
   Future<String> fetchRunLog() async => runLog;
+}
+
+class _EmptyPollingController extends RunPollingController {
+  @override
+  RunPollingState build() => const RunPollingState();
 }
 
 void main() {
@@ -59,7 +66,7 @@ void main() {
 
   Future<void> pumpSuccess(
     WidgetTester tester,
-    InstallSuccess success,
+    InstallFlowState success,
   ) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -68,6 +75,9 @@ void main() {
             () => _FixedInstallController(success),
           ),
           serverRepositoryProvider.overrideWithValue(FakeServerRepository()),
+          runPollingControllerProvider.overrideWith(
+            _EmptyPollingController.new,
+          ),
         ],
         child: MaterialApp(
           theme: lightTheme,
@@ -77,7 +87,75 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    // Running steps animate indefinitely; render their current state without
+    // waiting for an activity indicator to settle.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+  }
+
+  InstallRun hardeningRun(StepStatus stepStatus) => InstallRun(
+    runId: 'hardening-status',
+    serverId: 'server-1',
+    status: RunStatus.running,
+    steps: [
+      InstallStep(
+        key: 'hardening',
+        status: stepStatus,
+        label: 'Apply hardening',
+      ),
+    ],
+    scriptWasModified: false,
+    startedAt: DateTime(2026, 10, 6),
+  );
+
+  for (final status in [
+    StepStatus.pending,
+    StepStatus.running,
+    StepStatus.done,
+  ]) {
+    testWidgets('server protection $status never claims SSH hardening', (
+      tester,
+    ) async {
+      final l10n = await loadEn();
+      await pumpSuccess(tester, InstallRunning(hardeningRun(status)));
+      expect(find.text(l10n.stepHardening), findsOneWidget);
+      expect(find.text('Apply hardening'), findsNothing);
+      expect(find.text(l10n.hardeningApplied), findsNothing);
+      expect(find.text(l10n.installSuccessTitle), findsNothing);
+    });
+  }
+
+  testWidgets('app hardening remains in progress until verified', (
+    tester,
+  ) async {
+    final l10n = await loadEn();
+    await pumpSuccess(tester, InstallHardening(hardeningRun(StepStatus.done)));
+    expect(find.text(l10n.hardeningInProgress), findsOneWidget);
+    expect(find.text(l10n.hardeningApplied), findsNothing);
+    expect(find.text(l10n.installSuccessTitle), findsNothing);
+  });
+
+  for (final applied in [false, true]) {
+    testWidgets('verified hardening $applied controls the success claim', (
+      tester,
+    ) async {
+      final l10n = await loadEn();
+      await pumpSuccess(
+        tester,
+        InstallSuccess(
+          run: hardeningRun(StepStatus.done),
+          rootSshDisabled: false,
+          hardeningApplied: applied,
+          monitoringInstalled: false,
+        ),
+      );
+      expect(
+        find.text(l10n.hardeningApplied),
+        applied ? findsOneWidget : findsNothing,
+      );
+      expect(find.text(l10n.installSuccessTitle), findsOneWidget);
+      expect(find.text(l10n.hardeningIncompleteTitle), findsNothing);
+    });
   }
 
   Future<void> expandTechnicalDetails(
@@ -117,9 +195,22 @@ void main() {
       );
 
       expect(find.text(l10n.hardeningIncompleteTitle), findsOneWidget);
+      expect(find.text(l10n.installSuccessTitle), findsNothing);
+      expect(find.text(l10n.hardeningApplied), findsNothing);
+      expect(find.byIcon(Icons.warning_amber), findsOneWidget);
       expect(
         find.text('${l10n.antiLockoutWarning}\n\n${l10n.hardeningWarning}'),
         findsOneWidget,
+      );
+      expect(
+        tester
+            .getTopLeft(
+              find.text(
+                '${l10n.antiLockoutWarning}\n\n${l10n.hardeningWarning}',
+              ),
+            )
+            .dy,
+        lessThan(600),
       );
     },
   );

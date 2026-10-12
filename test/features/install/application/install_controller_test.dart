@@ -1014,6 +1014,65 @@ AllowedIPs = 0.0.0.0/0, ::/0
     expect(saved?.sshKeyId, isNull);
   });
 
+  for (final keyAvailable in [false, true]) {
+    test(
+      'recovery warns when hardening cannot be replayed (key: $keyAvailable)',
+      () async {
+        const paths = RunPaths('recovered-hardening');
+        final client = RecordingSshClient(
+          onRun: (command) => SshCommandResult(
+            stdout: command.contains(paths.statePath) ? '---WG-EXIT---\n0' : '',
+            stderr: '',
+            exitCode: 0,
+          ),
+        );
+        final servers = FakeServerRepository();
+        await servers.save(testServer());
+        final container = makeContainer(
+          client: client,
+          extraOverrides: [serverRepositoryProvider.overrideWithValue(servers)],
+        );
+        if (keyAvailable) {
+          await container
+              .read(sshKeyRepositoryProvider)
+              .getOrCreate(
+                serverId: 'srv-1',
+                comment: 'fav@srv-1',
+              );
+        }
+        await container
+            .read(installControllerProvider.notifier)
+            .attachRecovered(
+              client: client,
+              run: InstallRun(
+                runId: paths.runId,
+                serverId: 'srv-1',
+                status: RunStatus.running,
+                steps: const [],
+                scriptWasModified: false,
+                startedAt: DateTime(2026, 10, 12),
+                options: const AdvancedOptions(
+                  enableMonitoring: false,
+                  enableHardening: true,
+                ),
+                managementUsername: 'favops',
+              ),
+              paths: paths,
+              server: testServer(),
+              sshPassword: 'pw',
+            );
+        final state =
+            container.read(installControllerProvider) as InstallSuccess;
+        expect(state.hardeningApplied, isFalse);
+        expect(state.hardeningWarning?.code, ErrorCode.lockoutAborted);
+        expect(
+          (await servers.getById('srv-1'))?.installation?.hardeningApplied,
+          isFalse,
+        );
+      },
+    );
+  }
+
   test('a finished recovered run drops off the incomplete list', () async {
     // The resume banner reads the cached incompleteRunsProvider: without an
     // invalidate at the terminal transition it kept offering to resume a run

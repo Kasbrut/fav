@@ -534,6 +534,8 @@ class _SuccessView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final backup = state.configBackupPath;
+    final hardeningIncomplete =
+        state.lockoutWarning != null || state.hardeningWarning != null;
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.xl,
@@ -545,13 +547,17 @@ class _SuccessView extends ConsumerWidget {
         Column(
           children: [
             Icon(
-              Icons.check_circle,
-              color: context.semantic.success,
+              hardeningIncomplete ? Icons.warning_amber : Icons.check_circle,
+              color: hardeningIncomplete
+                  ? context.semantic.warning
+                  : context.semantic.success,
               size: AppSizes.emptyStateIcon,
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              l10n.installSuccessTitle,
+              hardeningIncomplete
+                  ? l10n.hardeningIncompleteTitle
+                  : l10n.installSuccessTitle,
               textAlign: TextAlign.center,
               style: theme.textTheme.headlineSmall,
             ),
@@ -559,6 +565,17 @@ class _SuccessView extends ConsumerWidget {
             Text(l10n.installSuccessBody, textAlign: TextAlign.center),
           ],
         ),
+        if (hardeningIncomplete) ...[
+          const SizedBox(height: AppSpacing.lg),
+          AppBanner(
+            variant: AppBannerVariant.warning,
+            icon: Icons.shield_outlined,
+            message: [
+              if (state.lockoutWarning != null) l10n.antiLockoutWarning,
+              if (state.hardeningWarning != null) l10n.hardeningWarning,
+            ].join('\n\n'),
+          ),
+        ],
         const SizedBox(height: AppSpacing.xl),
         // What changed: a scannable summary of the outcomes, not loose
         // centered sentences.
@@ -575,18 +592,6 @@ class _SuccessView extends ConsumerWidget {
         if (state.hardeningApplied) ...[
           const SizedBox(height: AppSpacing.sm),
           _OutcomeRow(label: l10n.hardeningApplied),
-        ],
-        if (state.lockoutWarning != null || state.hardeningWarning != null) ...[
-          const SizedBox(height: AppSpacing.lg),
-          AppBanner(
-            variant: AppBannerVariant.warning,
-            icon: Icons.shield_outlined,
-            title: l10n.hardeningIncompleteTitle,
-            message: [
-              if (state.lockoutWarning != null) l10n.antiLockoutWarning,
-              if (state.hardeningWarning != null) l10n.hardeningWarning,
-            ].join('\n\n'),
-          ),
         ],
         const SizedBox(height: AppSpacing.xl),
         PrimaryButton(
