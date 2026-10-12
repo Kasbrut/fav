@@ -8,13 +8,15 @@
     <title>FAV — Your WireGuard server, under your control</title>
     <link rel="stylesheet" href="../assets/site.css">
     <link rel="icon" href="../assets/favicon.png">
+    <script src="../assets/site.js" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#content">Skip to content</a>
     <header class="site-header">
       <div class="header-inner">
         <a class="brand" href="./"><img src="../assets/favicon.png" alt="">FAV</a>
-        <nav class="nav" aria-label="Main navigation">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Toggle navigation" hidden><span class="nav-toggle-lines" aria-hidden="true"></span></button>
+        <nav id="site-nav" class="nav" aria-label="Main navigation">
           <a href="./" aria-current="page">Overview</a>
           <a href="getting-started.html">Get started</a>
           <a href="downloads.html">Downloads</a>
