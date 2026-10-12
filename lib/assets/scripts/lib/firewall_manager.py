@@ -157,6 +157,15 @@ def rule_present(argv):
     return run(check, check=False).returncode == 0
 
 
+def delete_rule(argv, check=True):
+    delete = argv.copy()
+    pos = delete.index("-I") if "-I" in delete else delete.index("-A")
+    delete[pos] = "-D"
+    if argv[pos] == "-I":
+        del delete[pos + 2]
+    return run(delete, check=check)
+
+
 def apply(manifest):
     data = secure_json(manifest)
     wanted, sysctls = commands(data)
@@ -167,31 +176,60 @@ def apply(manifest):
         valid_owned(data)
     added = []
     changed = []
+    guards = []
     try:
+        # Forwarding may already be enabled and owned chains may need repair.
+        # Keep interface traffic denied until both families are fully protected.
+        tag = "fav:" + data["installationId"] + ":" + data["interfaceName"] + ":applying"
+        for binary in ("iptables", "ip6tables"):
+            for chain, direction in (("FORWARD", "-i"), ("FORWARD", "-o"), ("INPUT", "-i")):
+                guard = [binary, "-I", chain, "1", direction, data["interfaceName"],
+                         "-m", "comment", "--comment", tag, "-j", "REJECT"]
+                if not rule_present(guard):
+                    run(guard)
+                guards.append(guard)
+        # Preserve the manifest's canonical command order for existing installs,
+        # but populate chains before making their jumps reachable in host chains.
+        ordered = [argv for argv in wanted if "-I" not in argv]
+        ordered += [argv for argv in wanted if "-I" in argv]
+        for argv in ordered:
+            if argv[1] == "-N":
+                if run([argv[0], "-L", argv[2]], check=False).returncode != 0:
+                    run(argv); added.append(argv)
+            elif not rule_present(argv):
+                actual = argv.copy()
+                if "-I" in actual:
+                    # Jumps must remain below the temporary interface guards.
+                    actual[actual.index("-I") + 2] = "3" if actual[2] == "FORWARD" else "2"
+                run(actual); added.append(argv)
         for entry in sysctls:
             current = run(["sysctl", "-n", entry["name"]]).stdout.strip()
             entry["original"] = originals.get(entry["name"], current)
             if current != entry["applied"]:
                 run(["sysctl", "-w", entry["name"] + "=" + entry["applied"]])
                 changed.append(dict(entry, original=current))
-        for argv in wanted:
-            if argv[1] == "-N":
-                if run([argv[0], "-L", argv[2]], check=False).returncode != 0:
-                    run(argv); added.append(argv)
-            elif not rule_present(argv):
-                run(argv); added.append(argv)
         data["resources"] = {"rules": wanted, "routes": [], "sysctls": sysctls}
         atomic(manifest, data)
     except Exception:
+        # Disable newly enabled forwarding before dismantling its protections.
+        restored = True
+        for entry in reversed(changed):
+            result = run(["sysctl", "-w", entry["name"] + "=" + entry["original"]], check=False)
+            restored = result.returncode == 0 and restored
+        # If restoration fails, retain the complete rules and remaining guards.
+        if not restored:
+            raise
         for argv in reversed(added):
             if argv[1] == "-N": run([argv[0], "-X", argv[2]], check=False)
-            else:
-                delete = argv.copy(); pos = delete.index("-I") if "-I" in delete else delete.index("-A"); delete[pos] = "-D"
-                if argv[pos] == "-I": del delete[pos + 2]
-                run(delete, check=False)
-        for entry in reversed(changed):
-            run(["sysctl", "-w", entry["name"] + "=" + entry["original"]], check=False)
+            else: delete_rule(argv, check=False)
+        for guard in reversed(guards):
+            delete_rule(guard, check=False)
         raise
+    # Once ownership is persisted, a cleanup failure leaves a recoverable deny
+    # guard rather than rolling back rules referenced by the saved manifest.
+    while guards:
+        delete_rule(guards[-1])
+        guards.pop()
 
 
 def valid_owned(data):

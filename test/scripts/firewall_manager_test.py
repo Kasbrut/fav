@@ -26,6 +26,47 @@ def manifest(mode="routed", wan4="eth4", wan6="eth6"):
     }
 
 
+class FirewallState:
+    def __init__(self, forwarding="0"):
+        self.calls = []
+        self.chains = set()
+        self.rules = {}
+        self.sysctls = {"net.ipv4.ip_forward": forwarding,
+                        "net.ipv6.conf.all.forwarding": forwarding,
+                        "net.ipv6.conf.eth6.accept_ra": "0"}
+
+    def run(self, argv, check=True):
+        self.calls.append(argv.copy())
+        if argv[0] == "sysctl":
+            if argv[1] == "-n":
+                return types.SimpleNamespace(returncode=0, stdout=self.sysctls[argv[2]])
+            name, value = argv[2].split("=")
+            self.sysctls[name] = value
+            return types.SimpleNamespace(returncode=0, stdout="")
+        pos = next(i for i, arg in enumerate(argv) if arg in ("-N", "-L", "-X", "-I", "-A", "-C", "-D"))
+        action, chain = argv[pos:pos + 2]
+        key = tuple(argv[:pos] + [chain])
+        if action == "-L":
+            code = 0 if key in self.chains else 1
+        elif action == "-N":
+            self.chains.add(key); code = 0
+        elif action == "-X":
+            self.chains.discard(key); code = 0
+        else:
+            args = tuple(argv[pos + (3 if action == "-I" else 2):])
+            rules = self.rules.setdefault(key, [])
+            code = 0
+            if action == "-C":
+                code = 0 if args in rules else 1
+            elif action == "-D":
+                rules.remove(args)
+            elif action == "-I":
+                rules.insert(int(argv[pos + 2]) - 1, args)
+            else:
+                rules.append(args)
+        return types.SimpleNamespace(returncode=code, stdout="")
+
+
 class FirewallManagerTest(unittest.TestCase):
     def test_routed_uses_distinct_wans_pmtu_and_never_nat66(self):
         rules, sysctls = fw.commands(manifest())
@@ -121,7 +162,79 @@ class FirewallManagerTest(unittest.TestCase):
             with self.assertRaises(fw.subprocess.CalledProcessError):
                 fw.apply("manifest.json")
         self.assertTrue(any("-D" in call or "-X" in call for call in calls))
-        self.assertIn(["sysctl", "-w", "net.ipv4.ip_forward=0"], calls)
+        self.assertFalse(any(call[:2] == ["sysctl", "-w"] for call in calls))
+
+    def test_apply_populates_before_attach_and_enables_forwarding_last(self):
+        for mode in ("routed", "blocked"):
+            with self.subTest(mode=mode):
+                data = manifest(mode)
+                state = FirewallState()
+                with mock.patch.object(fw, "secure_json", return_value=data), \
+                        mock.patch.object(fw, "run", side_effect=state.run), \
+                        mock.patch.object(fw, "atomic"):
+                    fw.apply("manifest.json")
+                writes = [i for i, call in enumerate(state.calls) if call[:2] == ["sysctl", "-w"]]
+                attaches = [i for i, call in enumerate(state.calls)
+                            if "-I" in call and call[-1].startswith("FAV")]
+                populations = [i for i, call in enumerate(state.calls) if "-A" in call]
+                self.assertLess(max(populations), min(attaches))
+                self.assertLess(max(attaches), min(writes))
+                self.assertTrue(all(state.calls[i][3] in ("2", "3") for i in attaches))
+                self.assertFalse(any("applying" in " ".join(rule)
+                                     for rules in state.rules.values() for rule in rules))
+
+    def test_reapply_repairs_under_guards_and_preserves_original_sysctls(self):
+        data = manifest()
+        state = FirewallState(forwarding="1")
+        with mock.patch.object(fw, "secure_json", return_value=data), \
+                mock.patch.object(fw, "run", side_effect=state.run), \
+                mock.patch.object(fw, "atomic"):
+            fw.apply("manifest.json")
+            originals = [entry["original"] for entry in data["resources"]["sysctls"]]
+            state.rules[("ip6tables", "FAV6I_wg0")].pop()
+            state.calls.clear()
+            fw.apply("manifest.json")
+            self.assertEqual(originals, [entry["original"] for entry in data["resources"]["sysctls"]])
+            fw.valid_owned(data)
+        repaired = next(i for i, call in enumerate(state.calls) if call[:3] == ["ip6tables", "-A", "FAV6I_wg0"])
+        guards = [i for i, call in enumerate(state.calls) if "-I" in call and call[-1] == "REJECT"]
+        self.assertEqual(len(guards), 6)
+        self.assertLess(max(guards), repaired)
+        self.assertEqual(state.rules[("ip6tables", "FAV6I_wg0")][-1][-1], "REJECT")
+        self.assertEqual(len(state.rules[("iptables", "FORWARD")]), 1)
+
+    def test_persistence_failure_restores_forwarding_before_removing_rules(self):
+        data = manifest()
+        state = FirewallState()
+        with mock.patch.object(fw, "secure_json", return_value=data), \
+                mock.patch.object(fw, "run", side_effect=state.run), \
+                mock.patch.object(fw, "atomic", side_effect=OSError("disk full")):
+            with self.assertRaises(OSError):
+                fw.apply("manifest.json")
+        restores = [i for i, call in enumerate(state.calls)
+                    if call[:2] == ["sysctl", "-w"] and call[2].endswith("=0")]
+        deletions = [i for i, call in enumerate(state.calls) if "-D" in call]
+        self.assertLess(max(restores), min(deletions))
+        self.assertFalse(state.chains)
+        self.assertFalse(any(state.rules.values()))
+
+    def test_failed_forwarding_restore_retains_protections(self):
+        data = manifest("blocked")
+        state = FirewallState()
+
+        def fail_restore(argv, check=True):
+            if argv == ["sysctl", "-w", "net.ipv4.ip_forward=0"]:
+                state.calls.append(argv)
+                return types.SimpleNamespace(returncode=1, stdout="")
+            return state.run(argv, check)
+
+        with mock.patch.object(fw, "secure_json", return_value=data), \
+                mock.patch.object(fw, "run", side_effect=fail_restore), \
+                mock.patch.object(fw, "atomic", side_effect=OSError("disk full")):
+            with self.assertRaises(OSError):
+                fw.apply("manifest.json")
+        self.assertFalse(any("-D" in call or "-X" in call for call in state.calls))
+        self.assertTrue(state.rules[("iptables", "FAV4_wg0")])
 
     def test_remove_is_idempotent_after_wg_quick_postdown(self):
         data = manifest("blocked", wan6=None)

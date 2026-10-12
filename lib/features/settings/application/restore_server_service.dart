@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:fav/core/crypto/ed25519_keypair.dart';
 import 'package:fav/core/persistence/secure_store.dart';
@@ -20,6 +21,12 @@ const String _appendKeySnippet =
     'touch .ssh/authorized_keys; chmod 700 .ssh; chmod 600 .ssh/authorized_keys; '
     r'key="$(cat)"; grep -qxF -- "$key" .ssh/authorized_keys '
     r'|| printf "%s\n" "$key" >> .ssh/authorized_keys';
+
+const String _verifyKeyRemovedSnippet =
+    r'cd "$HOME" || exit 2; f=.ssh/authorized_keys; '
+    r'[ -f "$f" ] || exit 0; key="$(cat)"; '
+    r'grep -qxF -- "$key" "$f"; status=$?; '
+    r'[ "$status" -eq 1 ]';
 
 /// Parses and validates the peer list returned by `wg show … peers`.
 Set<String> parseWireGuardPeerKeys(String output) {
@@ -64,8 +71,15 @@ class RestoreServerService {
     if (oldPair == null) throw StateError('restored SSH key is unavailable');
     final secureStore = _ref.read(secureStoreProvider);
     final pendingKey = 'ssh-rotation-pending:$keyId';
-    final pendingOldLine = await secureStore.read(pendingKey);
-    if (pendingOldLine != null) {
+    final pending = await secureStore.read(pendingKey);
+    final currentLine = oldPair.authorizedKeysEntry(
+      comment: 'fav@${server.id}',
+    );
+    // Older versions only recorded the obsolete public line after committing.
+    if (pending != null && pending.startsWith('ssh-ed25519 ')) {
+      if (pending == currentLine) {
+        throw StateError('rotation journal would revoke the current SSH key');
+      }
       final cleanupClient = _ref.read(sshClientFactoryProvider)();
       try {
         await cleanupClient.connect(
@@ -82,31 +96,63 @@ class RestoreServerService {
         );
         await removeAppKeyFromAuthorizedKeys(
           client: cleanupClient,
-          publicKeyLine: pendingOldLine,
+          publicKeyLine: pending,
         );
+        await _verifyKeyRemoved(cleanupClient, pending);
         await secureStore.delete(pendingKey);
         return;
       } finally {
         await cleanupClient.close();
       }
     }
-    final newPair = await Ed25519KeyPair.generate();
-    final oldLine = oldPair.authorizedKeysEntry(comment: 'fav@${server.id}');
+    final Ed25519KeyPair newPair;
+    final String oldLine;
+    if (pending == null) {
+      newPair = await Ed25519KeyPair.generate();
+      oldLine = currentLine;
+      // Write ahead of both remote installation and local seed replacement.
+      // Recovery therefore retains the replacement even if the seed commit
+      // failed, and never mistakes the still-current key for an obsolete one.
+      await secureStore.write(
+        pendingKey,
+        jsonEncode({
+          'version': 1,
+          'oldLine': oldLine,
+          'newSeed': base64Encode(newPair.seedBytes),
+        }),
+      );
+    } else {
+      try {
+        final journal = jsonDecode(pending) as Map<String, dynamic>;
+        if (journal['version'] != 1) throw const FormatException();
+        oldLine = journal['oldLine'] as String;
+        newPair = await Ed25519KeyPair.fromSeed(
+          Uint8List.fromList(base64Decode(journal['newSeed'] as String)),
+        );
+      } on Object {
+        // Do not expose a malformed journal's private seed in error details.
+        throw StateError('invalid SSH rotation journal');
+      }
+    }
     final newLine = newPair.authorizedKeysEntry(comment: 'fav@${server.id}');
+    if (oldLine == newLine ||
+        (currentLine != oldLine && currentLine != newLine)) {
+      throw StateError('SSH rotation journal does not match the stored key');
+    }
     final oldClient = _ref.read(sshClientFactoryProvider)();
-    await oldClient.connect(
-      SshConnectionParams(
-        host: server.host,
-        port: server.sshPort,
-        username: server.username,
-        password: '',
-        identities: [
-          oldPair.asDartSshKeyPair(comment: 'fav@${server.id}'),
-        ],
-        passwordAuthAllowed: false,
-      ),
-    );
     try {
+      await oldClient.connect(
+        SshConnectionParams(
+          host: server.host,
+          port: server.sshPort,
+          username: server.username,
+          password: '',
+          identities: [
+            oldPair.asDartSshKeyPair(comment: 'fav@${server.id}'),
+          ],
+          passwordAuthAllowed: false,
+        ),
+      );
       final append = await oldClient.run(_appendKeySnippet, stdin: newLine);
       if (!append.isSuccess) throw StateError('new SSH key was not installed');
       final newClient = _ref.read(sshClientFactoryProvider)();
@@ -123,34 +169,30 @@ class RestoreServerService {
             passwordAuthAllowed: false,
           ),
         );
-      } on Object {
-        await removeAppKeyFromAuthorizedKeys(
-          client: oldClient,
-          publicKeyLine: newLine,
+        // A crash on either side of this write is recoverable from the journal.
+        // Keep the verified replacement connection for revocation as well.
+        await secureStore.write(
+          'ssh-key:$keyId',
+          base64Encode(newPair.seedBytes),
         );
-        rethrow;
+        await removeAppKeyFromAuthorizedKeys(
+          client: newClient,
+          publicKeyLine: oldLine,
+        );
+        await _verifyKeyRemoved(newClient, oldLine);
+        await secureStore.delete(pendingKey);
       } finally {
         await newClient.close();
       }
-      // Persist before revoking the old key: a crash after this point leaves
-      // a usable new credential, never a server with no locally held key.
-      await secureStore.write(
-        'ssh-key:$keyId',
-        base64Encode(newPair.seedBytes),
-      );
-      try {
-        await removeAppKeyFromAuthorizedKeys(
-          client: oldClient,
-          publicKeyLine: oldLine,
-        );
-      } on Object {
-        // The new key is already persisted and verified. Remember the exact
-        // obsolete public line so a retry can remove it using the new key.
-        await secureStore.write(pendingKey, oldLine);
-        rethrow;
-      }
     } finally {
       await oldClient.close();
+    }
+  }
+
+  Future<void> _verifyKeyRemoved(SshClient client, String oldLine) async {
+    final result = await client.run(_verifyKeyRemovedSnippet, stdin: oldLine);
+    if (!result.isSuccess) {
+      throw StateError('obsolete SSH key revocation could not be verified');
     }
   }
 

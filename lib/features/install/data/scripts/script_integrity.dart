@@ -11,9 +11,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// which recomputes the hashes from the real asset files and fails on drift.
 const Map<String, String> kBundledScriptHashes = {
   'disable_password_auth.sh':
-      '14467115e858be3cf1ea74f2f7ad75dfd3ddc9491c733567b0fd7550d287b9b5',
+      '1d10840f8b94fb60329c59b06f2ec3241bf7fe01b64b54f25b5b297508c534f0',
   'disable_root_ssh.sh':
-      'c86102e90473e005719bea75a55a8ec03487dcf18f502f3fc545d47b6d3385de',
+      '9180e0a9578333fbb1ea7d654e86995c71a62c5c7644bc038b688f94b51e83ed',
   'install_monitor.sh':
       '41f3ac5824815e461de4dcf2136f551186cd7c924312fc8342090071bec47278',
   'install_wireguard.sh':
@@ -21,7 +21,7 @@ const Map<String, String> kBundledScriptHashes = {
   'lib/common.sh':
       '26b76bf5ff7d7e5f521d27786aae2c6dc22e04587bd336fa9ff57f7e7a098b18',
   'lib/firewall_manager.py':
-      '7c04d21981247278871274a76970dea787c04ae5aa730ea6b60eeee4bdc12f01',
+      '9933d4af43bba41f37fa5cbb9c3d3cd623d5b77ea8a90ea7817e3f5ae9ba7b73',
   'lib/network_probe.py':
       '932035d61703839b3625c6da3127b659a8fd886b48eff9d246b87800f9ba7fc7',
   'lib/profile_renderer.py':
@@ -84,7 +84,7 @@ const Map<String, String> kBundledScriptHashes = {
 
 /// Expected canonical hash over the whole bundled script set (spec §8.6).
 const String kBundledScriptSetHash =
-    '417cf5715ede4148034019123c080bd1192eb2aa09d77ea93247ad47815c303f';
+    'cf368c62f5360539c51fe8be5953451594e5b4968481e847f8fb175e7be8a707';
 
 /// Verifies the bundled scripts against the compiled-in hashes (spec §8.6).
 class ScriptIntegrityVerifier {

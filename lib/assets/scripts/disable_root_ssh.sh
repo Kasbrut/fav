@@ -37,17 +37,50 @@ rollback_sshd() {
   fi
 }
 
-# Succeeds if an sshd drop-in or Match block still permits root login.
-#
-# Any PermitRootLogin value other than `no` permits a root login —
-# `prohibit-password` and `without-password` (common on cloud images) allow
-# key-based root login, `forced-commands-only` allows it for forced commands.
-root_still_permitted() {
-  local config=$1
-  local dropins=${config%/sshd_config}/sshd_config.d
-  local permits='^[[:space:]]*PermitRootLogin[[:space:]]+'
-  permits+='(yes|prohibit-password|without-password|forced-commands-only)'
-  grep -rEl "$permits" "$config" "$dropins" 2>/dev/null | grep -q .
+# Audit every reachable Include, regardless of Match conditions. A global
+# sshd -T cannot prove that all users/addresses are safe. Reject any permissive
+# directive even if an earlier value might override it; do not sample users.
+# Relative Include paths are rooted at /etc/ssh (not the including file).
+# Only unquoted paths are resolved here. Ambiguous quoting/escaping, unreadable
+# files and excessive recursion fail closed. No config text is evaluated.
+included_policy_safe() {
+  local config=$1 policy=$2 depth=${3:-0}
+  local line key value pattern included
+  local -a patterns
+  (( depth < 16 )) && [[ -f $config && -r $config ]] || return 1
+  while IFS= read -r line || [[ -n $line ]]; do
+    [[ $line =~ ^[[:space:]]*(#.*)?$ ]] && continue
+    [[ $line =~ ^[[:space:]]*([[:alnum:]]+)[[:space:]=]+(.*)$ ]] || return 1
+    key=${BASH_REMATCH[1],,}
+    value=${BASH_REMATCH[2]}
+    # A value separator may be written "Option = value".
+    value=${value#=}
+    value=${value%%[[:space:]]#*}
+    value="${value#"${value%%[![:space:]]*}"}"
+    value="${value%"${value##*[![:space:]]}"}"
+    if [[ $key == include ]]; then
+      [[ -n $value && $value != *\"* && $value != *"'"* &&
+         $value != *\\* && $value != *'#'* && $value != *'$'* &&
+         $value != *'~'* ]] || return 1
+      IFS=$' \t' read -r -a patterns <<<"$value"
+      for pattern in "${patterns[@]}"; do
+        [[ $pattern == /* ]] || pattern="${WG_ROOT:-}/etc/ssh/$pattern"
+        # compgen expands globs without evaluating shell substitutions.
+        while IFS= read -r included; do
+          included_policy_safe "$included" "$policy" "$((depth + 1))" || return 1
+        done < <(compgen -G "$pattern" || true)
+      done
+    elif [[ $policy == password ]]; then
+      case $key in
+        passwordauthentication|kbdinteractiveauthentication|challengeresponseauthentication)
+          [[ ${value,,} == no ]] || return 1 ;;
+        pubkeyauthentication)
+          [[ ${value,,} == yes ]] || return 1 ;;
+      esac
+    elif [[ $key == permitrootlogin ]]; then
+      [[ ${value,,} == no ]] || return 1
+    fi
+  done <"$config"
 }
 
 # Succeeds if sshd's EFFECTIVE configuration still permits a root login.
@@ -71,21 +104,26 @@ main() {
 
   # Drop every PermitRootLogin line (commented or not, leading whitespace
   # tolerated, inside Match blocks too) and re-insert it once in the GLOBAL
-  # scope — before the first Match block if present, otherwise at EOF. A
-  # directive placed after `Match` is scoped to it and would not disable root
-  # globally.
+  # scope before all Include/Match directives. An included file may itself
+  # leave the parser inside a Match block.
   local stripped
   stripped=$(mktemp)
-  grep -Ev '^[[:space:]]*#?[[:space:]]*PermitRootLogin[[:space:]=]' "$config" \
+  grep -Eiv '^[[:space:]]*#?[[:space:]]*PermitRootLogin[[:space:]=]' "$config" \
     >"$stripped" || true
   awk '
-    !inserted && $1 == "Match" { print "PermitRootLogin no"; inserted = 1 }
+    BEGIN { print "PermitRootLogin no" }
     { print }
-    END { if (!inserted) print "PermitRootLogin no" }
   ' "$stripped" >"$candidate"
   rm -f "$stripped"
   if ! sshd -t -f "$candidate"; then
     log 'sshd config invalid; leaving root SSH enabled'
+    rm -f "$candidate"
+    printf 'WG-LCK-ABORTED\n'
+    return 1
+  fi
+
+  if ! included_policy_safe "$candidate" root; then
+    log 'Cannot prove all SSH Include/Match rules disable root login'
     rm -f "$candidate"
     printf 'WG-LCK-ABORTED\n'
     return 1
@@ -110,18 +148,9 @@ main() {
   # Verify the EFFECTIVE config: a Match block, Include or drop-in could leave
   # root login reachable even though the main file looks correct. Roll back
   # rather than report a change that did not take effect.
-  if root_login_still_permitted "$config"; then
+  if root_login_still_permitted "$config" || ! included_policy_safe "$config" root; then
     log 'sshd still permits root login after the change (Match block, Include'
     log 'or drop-in override); rolling back sshd_config'
-    rollback_sshd "$config" "$backup"
-    printf 'WG-LCK-ABORTED\n'
-    return 1
-  fi
-  # Secondary guard: a drop-in or Match block that re-enables root login (also
-  # covered by the check above on a host with `sshd -T`).
-  if root_still_permitted "$config"; then
-    log 'PermitRootLogin yes still present in an sshd drop-in;'
-    log 'root SSH is NOT fully disabled'
     rollback_sshd "$config" "$backup"
     printf 'WG-LCK-ABORTED\n'
     return 1
