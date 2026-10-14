@@ -1,11 +1,9 @@
-Security and reliability fixes:
+Backup restore reliability fix:
 
-- Fixed SSH hardening with cloud-init while rejecting unsafe conditional overrides.
-- Installation progress and results now distinguish verified hardening from incomplete or skipped hardening.
-- Made SSH key rotation recoverable after interruptions and installed firewall protections before enabling forwarding.
-- Tightened encrypted backup validation and resource limits.
-- Pinned CI actions to immutable commits and restricted signing-secret exposure.
+- Interrupted restores now roll back partial local data before startup migrations.
+- Restore retry preserves requested SSH-key rotation and peer-revocation options.
+- Recovery remains compatible with existing pending online restores.
 
-Validated on a Pixel 8a and Debian 13 VPS, including reboot recovery and VPN connectivity.
+Focused interruption and recovery tests cover the restored state.
 
 Android APKs, the Play Store AAB, Linux packages and checksums are attached when the release workflow completes. Google Play and sideloaded APKs use different signing keys: export a FAV backup before switching channels.
