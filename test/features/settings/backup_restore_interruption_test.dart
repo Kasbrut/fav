@@ -170,7 +170,7 @@ void main() {
           final flutterRoot = Platform.environment['FLUTTER_ROOT'];
           final flutterExecutable = flutterRoot == null
               ? 'flutter'
-              : '$flutterRoot${Platform.pathSeparator}bin${Platform.pathSeparator}flutter';
+              : [flutterRoot, 'bin', 'flutter'].join(Platform.pathSeparator);
           final child = await Process.run(
             flutterExecutable,
             [
