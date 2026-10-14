@@ -167,8 +167,12 @@ void main() {
           ).create('test password');
           await Hive.close();
 
+          final flutterRoot = Platform.environment['FLUTTER_ROOT'];
+          final flutterExecutable = flutterRoot == null
+              ? 'flutter'
+              : '$flutterRoot${Platform.pathSeparator}bin${Platform.pathSeparator}flutter';
           final child = await Process.run(
-            '/Users/lorenzo/fvm/versions/3.47.2/bin/flutter',
+            flutterExecutable,
             [
               'test',
               '--no-pub',
