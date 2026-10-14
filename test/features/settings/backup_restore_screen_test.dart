@@ -81,4 +81,20 @@ void main() {
     expect(find.text('Create encrypted backup'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'missing server does not silently complete pending security work',
+    (tester) async {
+      await tester.runAsync(
+        () => database.preferencesBox.put('pending_backup_restore', {
+          'serverIds': ['missing-server'],
+          'rotateSshKeys': true,
+          'revokePeers': true,
+        }),
+      );
+      await pump(tester, const Size(390, 844));
+      expect(database.preferencesBox.get('pending_backup_restore'), isNotNull);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

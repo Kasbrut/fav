@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -16,6 +17,32 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hive_ce/hive_ce.dart';
 
 import '../../support/in_memory_secure_store.dart';
+
+class _FailingStore extends InMemorySecureStore {
+  bool failRestore = false;
+  bool failCleanup = false;
+  bool failRollback = false;
+
+  @override
+  Future<void> write(String key, String value) async {
+    await super.write(key, value);
+    if (failRestore && key == 'client_profile:server-1') {
+      failRestore = false;
+      throw StateError('write failed after mutation');
+    }
+  }
+
+  @override
+  Future<void> delete(String key) async {
+    await super.delete(key);
+    if ((failCleanup && key == 'backup_restore_undo') ||
+        (failRollback && key == 'client_profile:server-1')) {
+      failCleanup = false;
+      failRollback = false;
+      throw StateError('interrupted cleanup');
+    }
+  }
+}
 
 void main() {
   late Directory tempDir;
@@ -155,6 +182,9 @@ void main() {
       revokePeers: true,
     );
     expect(service.pendingRestore?.serverIds, ['one', 'two']);
+    await service.recoverInterruptedRestore(); // Legacy marker has no journal.
+    expect(service.pendingRestore?.rotateSshKeys, isTrue);
+    expect(service.pendingRestore?.revokePeers, isTrue);
 
     await service.completeOnlineRestoreFor('one');
     expect(service.pendingRestore?.serverIds, ['two']);
@@ -162,4 +192,88 @@ void main() {
     await service.completeOnlineRestoreFor('two');
     expect(service.pendingRestore, isNull);
   });
+
+  test(
+    'ordinary write failure rolls back originals and retains options',
+    () async {
+      final sourceDb = await database('source');
+      final sourceStore = InMemorySecureStore();
+      await sourceStore.write('client_profile:server-1', 'new profile');
+      await HiveServerRepository(sourceDb.serversBox).save(
+        Server(
+          id: 'server-1',
+          label: 'Test',
+          host: 'vpn.example.com',
+          sshPort: 22,
+          username: 'admin',
+          createdAt: DateTime.utc(2026, 10, 8),
+        ),
+      );
+      final bytes = await BackupService(
+        sourceDb,
+        sourceStore,
+        codec: codec(),
+      ).create('backup password');
+      final db = await database('destination');
+      await db.preferencesBox.put('existing', {'themeMode': 'dark'});
+      final store = _FailingStore();
+      await store.write('client_profile:server-1', 'original profile');
+      store.failRestore = true;
+      final service = BackupService(db, store, codec: codec());
+      await expectLater(
+        service.restore(
+          bytes,
+          'backup password',
+          rotateSshKeys: true,
+          revokePeers: true,
+        ),
+        throwsStateError,
+      );
+      expect(service.hasRestorableData, isFalse);
+      expect(await store.read('client_profile:server-1'), 'original profile');
+      expect(db.preferencesBox.get('existing'), {'themeMode': 'dark'});
+      expect(service.interruptedRestore?.rotateSshKeys, isTrue);
+      expect(service.interruptedRestore?.revokePeers, isTrue);
+      expect(await store.read('backup_restore_undo'), isNull);
+    },
+  );
+
+  for (final duringRollback in [true, false]) {
+    test(
+      'repeats interrupted recovery cleanup (rollback=$duringRollback)',
+      () async {
+        final db = await database('recovery');
+        final store = _FailingStore();
+        await db.serversBox.put('partial', {'id': 'partial'});
+        await store.write('client_profile:server-1', 'partial profile');
+        await store.write(
+          'backup_restore_undo',
+          jsonEncode({
+            'client_profile:server-1': null,
+          }),
+        );
+        await db.preferencesBox.put('backup_restore_journal', {
+          'phase': 'writing',
+          'rotateSshKeys': true,
+          'revokePeers': true,
+          'preferences': <dynamic>[],
+        });
+        store
+          ..failRollback = duringRollback
+          ..failCleanup = !duringRollback;
+        await expectLater(
+          BackupService(db, store).recoverInterruptedRestore(),
+          throwsStateError,
+        );
+        final fresh = BackupService(db, store);
+        await fresh.recoverInterruptedRestore();
+        await fresh.recoverInterruptedRestore();
+        expect(fresh.hasRestorableData, isFalse);
+        expect(fresh.interruptedRestore?.rotateSshKeys, isTrue);
+        expect(fresh.interruptedRestore?.revokePeers, isTrue);
+        expect(await store.read('client_profile:server-1'), isNull);
+        expect(await store.read('backup_restore_undo'), isNull);
+      },
+    );
+  }
 }

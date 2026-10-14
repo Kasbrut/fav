@@ -33,6 +33,7 @@ class BackupRestoreScreen extends ConsumerStatefulWidget {
 class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
   bool _busy = false;
   bool _pendingLoaded = false;
+  bool _localRecoveryFailed = false;
   String? _status;
   PendingRestore? _pendingRestore;
   List<Server> _pendingServers = const [];
@@ -45,29 +46,39 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
 
   Future<void> _refreshPendingState() async {
     final service = ref.read(backupServiceProvider);
-    var pending = service.pendingRestore;
+    try {
+      await service.recoverInterruptedRestore();
+    } on Object {
+      if (mounted) {
+        setState(() {
+          _localRecoveryFailed = true;
+          _pendingLoaded = true;
+          _status = AppLocalizations.of(context)!.backupRestoreFailed;
+        });
+      }
+      return;
+    }
+    final pending = service.pendingRestore;
     var servers = const <Server>[];
+    var incomplete = service.interruptedRestore != null;
     if (pending != null) {
       final allServers = await ref.read(serverRepositoryProvider).getAll();
       final existingIds = allServers.map((server) => server.id).toSet();
-      for (final missingId in pending.serverIds.where(
-        (id) => !existingIds.contains(id),
-      )) {
-        await service.completeOnlineRestoreFor(missingId);
-      }
-      pending = service.pendingRestore;
-      if (pending != null) {
-        final pendingIds = pending.serverIds.toSet();
-        servers = allServers
-            .where((server) => pendingIds.contains(server.id))
-            .toList();
-      }
+      incomplete = pending.serverIds.any((id) => !existingIds.contains(id));
+      final pendingIds = pending.serverIds.toSet();
+      servers = allServers
+          .where((server) => pendingIds.contains(server.id))
+          .toList();
     }
     if (!mounted) return;
     setState(() {
       _pendingRestore = pending;
       _pendingServers = servers;
       _pendingLoaded = true;
+      _localRecoveryFailed = false;
+      if (incomplete) {
+        _status = AppLocalizations.of(context)!.backupRestoreFailed;
+      }
     });
   }
 
@@ -152,7 +163,10 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
       final options = await showDialog<_RestoreOptions>(
         context: context,
         barrierDismissible: false,
-        builder: (context) => _RestoreOptionsDialog(summary: summary),
+        builder: (context) => _RestoreOptionsDialog(
+          summary: summary,
+          interrupted: service.interruptedRestore,
+        ),
       );
       if (options == null || !mounted) {
         if (mounted) setState(() => _status = null);
@@ -191,6 +205,7 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
     } on Object {
       if (mounted) setState(() => _status = l10n.backupRestoreFailed);
     } finally {
+      if (mounted) await _refreshPendingState();
       if (mounted) setState(() => _busy = false);
     }
   }
@@ -201,7 +216,11 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
     final pending = service.pendingRestore;
     final servers = _pendingServers;
     if (pending == null || servers.isEmpty) {
-      if (mounted) setState(() => _status = null);
+      if (mounted && pending != null) {
+        setState(
+          () => _status = AppLocalizations.of(context)!.backupRestoreFailed,
+        );
+      }
       return;
     }
     setState(() {
@@ -230,8 +249,8 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
           ],
         ),
       );
-      await _refreshPendingState();
       if (mounted) setState(() => _status = null);
+      await _refreshPendingState();
     } on Object {
       if (mounted) {
         setState(
@@ -305,7 +324,9 @@ class _BackupRestoreScreenState extends ConsumerState<BackupRestoreScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final cannotRestore = ref.read(backupServiceProvider).hasRestorableData;
+    final cannotRestore =
+        _localRecoveryFailed ||
+        ref.read(backupServiceProvider).hasRestorableData;
     final pendingRestore = _pendingRestore;
     return Scaffold(
       appBar: ResponsiveAppBar(
@@ -573,9 +594,10 @@ class _RestoreOptions {
 }
 
 class _RestoreOptionsDialog extends StatefulWidget {
-  const _RestoreOptionsDialog({required this.summary});
+  const _RestoreOptionsDialog({required this.summary, this.interrupted});
 
   final BackupSummary summary;
+  final PendingRestore? interrupted;
 
   @override
   State<_RestoreOptionsDialog> createState() => _RestoreOptionsDialogState();
@@ -584,6 +606,13 @@ class _RestoreOptionsDialog extends StatefulWidget {
 class _RestoreOptionsDialogState extends State<_RestoreOptionsDialog> {
   bool _rotate = false;
   bool _revoke = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _rotate = widget.interrupted?.rotateSshKeys ?? false;
+    _revoke = widget.interrupted?.revokePeers ?? false;
+  }
 
   Future<void> _selectRevoke(bool selected) async {
     if (!selected) {

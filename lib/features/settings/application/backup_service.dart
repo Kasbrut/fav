@@ -19,6 +19,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive_ce.dart';
 
 const String _pendingRestoreKey = 'pending_backup_restore';
+const String _restoreJournalKey = 'backup_restore_journal';
+const String _restoreUndoKey = 'backup_restore_undo';
 
 /// Summary shown before and after restoring a backup.
 class BackupSummary {
@@ -78,6 +80,86 @@ class BackupService {
       _database.runsBox.isNotEmpty ||
       _database.scriptsBox.isNotEmpty;
 
+  /// Options retained after an interrupted local restore was rolled back.
+  PendingRestore? get interruptedRestore {
+    final raw = _database.preferencesBox.get(_restoreJournalKey);
+    if (raw == null || raw['phase'] != 'retry') return null;
+    return PendingRestore(
+      serverIds: const [],
+      rotateSshKeys: raw['rotateSshKeys'] as bool,
+      revokePeers: raw['revokePeers'] as bool,
+    );
+  }
+
+  Future<void> _journal(Map<dynamic, dynamic> value) async {
+    await _database.preferencesBox.put(_restoreJournalKey, value);
+    await _database.preferencesBox.flush();
+  }
+
+  /// Rolls back unfinished local writes before normal app state is exposed.
+  /// Every cleanup step can be repeated after another interruption.
+  Future<void> recoverInterruptedRestore() async {
+    final raw = _database.preferencesBox.get(_restoreJournalKey);
+    if (raw == null) return; // Includes legacy online-only sessions.
+    final journal = Map<dynamic, dynamic>.from(raw);
+    final phase = journal['phase'];
+    if (phase == 'online') {
+      await _secureStore.delete(_restoreUndoKey);
+      await _database.preferencesBox.delete(_restoreJournalKey);
+      await _database.preferencesBox.flush();
+      return;
+    }
+    if (phase == 'writing') {
+      final encoded = await _secureStore.read(_restoreUndoKey);
+      if (encoded == null) {
+        throw const BackupFormatException('missing restore recovery data');
+      }
+      final undo = jsonDecode(encoded) as Map<String, dynamic>;
+      await _database.serversBox.clear();
+      await _database.peersBox.clear();
+      await _database.runsBox.clear();
+      await _database.scriptsBox.clear();
+      for (final entry in undo.entries) {
+        if (entry.value == null) {
+          await _secureStore.delete(entry.key);
+        } else {
+          await _secureStore.write(entry.key, entry.value as String);
+        }
+      }
+      // Never clear the journal while rollback is still in progress.
+      for (final key in _database.preferencesBox.keys.toList()) {
+        if (key != _restoreJournalKey) {
+          await _database.preferencesBox.delete(key);
+        }
+      }
+      for (final row in journal['preferences'] as List<dynamic>) {
+        final value = row as Map;
+        await _database.preferencesBox.put(
+          value['key'],
+          Map<dynamic, dynamic>.from(value['value'] as Map),
+        );
+      }
+      await _flushLocalBoxes();
+    } else if (phase != 'preparing' && phase != 'retry') {
+      throw const BackupFormatException('invalid restore recovery phase');
+    }
+    // Commit rollback before removing its undo data.
+    await _journal({
+      'phase': 'retry',
+      'rotateSshKeys': journal['rotateSshKeys'],
+      'revokePeers': journal['revokePeers'],
+    });
+    await _secureStore.delete(_restoreUndoKey);
+  }
+
+  Future<void> _flushLocalBoxes() async {
+    await _database.serversBox.flush();
+    await _database.peersBox.flush();
+    await _database.runsBox.flush();
+    await _database.scriptsBox.flush();
+    await _database.preferencesBox.flush();
+  }
+
   /// Pending online verification, if a restore has not fully completed.
   PendingRestore? get pendingRestore {
     final raw = _database.preferencesBox.get(_pendingRestoreKey);
@@ -102,13 +184,15 @@ class BackupService {
     final ids = serverIds.toList();
     if (ids.isEmpty) {
       await _database.preferencesBox.delete(_pendingRestoreKey);
+      await _database.preferencesBox.flush();
       return;
     }
-    return _database.preferencesBox.put(_pendingRestoreKey, {
+    await _database.preferencesBox.put(_pendingRestoreKey, {
       'serverIds': ids,
       'rotateSshKeys': rotateSshKeys,
       'revokePeers': revokePeers,
     });
+    await _database.preferencesBox.flush();
   }
 
   /// Marks one server complete and removes the session after the final server.
@@ -118,6 +202,7 @@ class BackupService {
     final remaining = pending.serverIds.where((id) => id != serverId).toList();
     if (remaining.isEmpty) {
       await _database.preferencesBox.delete(_pendingRestoreKey);
+      await _database.preferencesBox.flush();
       return;
     }
     await beginOnlineRestore(
@@ -166,7 +251,8 @@ class BackupService {
     }
 
     final preferences = _database.preferencesBox.toMap()
-      ..remove(_pendingRestoreKey);
+      ..remove(_pendingRestoreKey)
+      ..remove(_restoreJournalKey);
     final sanitizedPreferences = <Object?, Map<dynamic, dynamic>>{};
     for (final entry in preferences.entries) {
       final value = Map<dynamic, dynamic>.from(entry.value)
@@ -225,6 +311,7 @@ class BackupService {
     bool rotateSshKeys = false,
     bool revokePeers = false,
   }) async {
+    await recoverInterruptedRestore();
     if (hasRestorableData) {
       throw const BackupFormatException('restore requires an empty app');
     }
@@ -232,9 +319,27 @@ class BackupService {
     _validate(payload);
     final boxes = payload['boxes'] as Map<String, dynamic>;
     final secure = payload['secure'] as Map<String, dynamic>;
-    final writtenSecureKeys = <String>[];
+    final originalPreferences = _database.preferencesBox.toMap()
+      ..remove(_restoreJournalKey);
+    final journal = <String, dynamic>{
+      'phase': 'preparing',
+      'rotateSshKeys': rotateSshKeys,
+      'revokePeers': revokePeers,
+      'preferences': _mapRows(originalPreferences),
+    };
+    final secureValues = _secureValues(secure);
+    await _journal(journal);
     try {
-      await _restoreSecure(secure, writtenSecureKeys);
+      final undo = <String, String?>{};
+      for (final key in secureValues.keys) {
+        undo[key] = await _secureStore.read(key);
+      }
+      await _secureStore.write(_restoreUndoKey, jsonEncode(undo));
+      journal['phase'] = 'writing';
+      await _journal(journal);
+      for (final entry in secureValues.entries) {
+        await _secureStore.write(entry.key, entry.value);
+      }
       await _putRows(_database.serversBox, boxes['servers'] as List<dynamic>);
       await _putRows(_database.peersBox, boxes['peers'] as List<dynamic>);
       await _putRows(
@@ -254,15 +359,12 @@ class BackupService {
         rotateSshKeys: rotateSshKeys,
         revokePeers: revokePeers,
       );
+      await _flushLocalBoxes();
+      journal['phase'] = 'online';
+      await _journal(journal);
+      await recoverInterruptedRestore();
     } on Object {
-      await _database.serversBox.clear();
-      await _database.peersBox.clear();
-      await _database.runsBox.clear();
-      await _database.scriptsBox.clear();
-      await _database.preferencesBox.clear();
-      for (final key in writtenSecureKeys) {
-        await _secureStore.delete(key);
-      }
+      await recoverInterruptedRestore();
       rethrow;
     }
     return BackupSummary(
@@ -351,6 +453,9 @@ class BackupService {
         userScriptFromMap(row.value);
       }
       for (final row in preferences) {
+        if (row.key == _restoreJournalKey || row.key == _pendingRestoreKey) {
+          throw const BackupFormatException('reserved backup preference');
+        }
         UserPreferences.fromJson(row.value);
       }
       DateTime.parse(payload['createdAt'] as String);
@@ -397,20 +502,13 @@ class BackupService {
     }).toList();
   }
 
-  Future<void> _restoreSecure(
-    Map<String, dynamic> secure,
-    List<String> written,
-  ) async {
-    Future<void> write(String key, String value) async {
-      await _secureStore.write(key, value);
-      written.add(key);
-    }
-
+  Map<String, String> _secureValues(Map<String, dynamic> secure) {
+    final values = <String, String>{};
     final pins = secure['hostKeys'] as Map<String, dynamic>? ?? const {};
     for (final raw in pins.values) {
       final pin = raw as Map<String, dynamic>;
       final key = 'hostkey:${pin['host']}:${pin['port']}';
-      await write(key, jsonEncode(pin));
+      values[key] = jsonEncode(pin);
     }
     final seeds = secure['sshKeySeeds'] as Map<String, dynamic>? ?? const {};
     for (final entry in seeds.entries) {
@@ -418,18 +516,19 @@ class BackupService {
       if (decoded.length != 32) {
         throw const BackupFormatException('invalid SSH key in backup');
       }
-      await write('ssh-key:${entry.key}', entry.value as String);
+      values['ssh-key:${entry.key}'] = entry.value as String;
     }
     final profiles =
         secure['peerProfiles'] as Map<String, dynamic>? ?? const {};
     for (final entry in profiles.entries) {
-      await write('client_profile:${entry.key}', entry.value as String);
+      values['client_profile:${entry.key}'] = entry.value as String;
     }
     final legacy =
         secure['legacyProfiles'] as Map<String, dynamic>? ?? const {};
     for (final entry in legacy.entries) {
-      await write('client_profile:${entry.key}', entry.value as String);
+      values['client_profile:${entry.key}'] = entry.value as String;
     }
+    return values;
   }
 
   Future<void> _putRows(

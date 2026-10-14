@@ -5,6 +5,7 @@ import 'package:fav/features/peers/data/hive_peer_repository.dart';
 import 'package:fav/features/peers/data/legacy_peer_migrator.dart';
 import 'package:fav/features/peers/data/secure_peer_secret_repository.dart';
 import 'package:fav/features/servers/data/hive_server_repository.dart';
+import 'package:fav/features/settings/application/backup_service.dart';
 import 'package:fav/features/settings/application/preferences_controller.dart';
 import 'package:fav/features/settings/data/preferences_repository.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ Future<void> main() async {
   try {
     database = await bootstrapAppDatabase();
     final secureStore = createSecureStore();
+    await BackupService(database, secureStore).recoverInterruptedRestore();
     // Multi-peer v1.1: migrate any legacy `client_profile:<serverId>` entries
     // into the new peers box + `client_profile:<peerId>` layout. Idempotent —
     // re-running on a fully-migrated install is a no-op. We use a stable
