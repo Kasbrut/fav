@@ -10,7 +10,7 @@ environment:
   flutter: ">=3.44.0"
 
 dependencies:
-  crypto: ^3.0.7
+  crypto: ^3.0.8
   cryptography: ^2.7.0
   # App-level font package: Flutter framework/plugin code references
   # CupertinoIcons glyphs, so the app must bundle the font even when no
